@@ -88,7 +88,7 @@ EarthTrend Lens pre-configures three planetary case studies demonstrating asymme
 ├────────────────────────┬───────────────────────────┬───────────────────────────────────┤
 │ Case ID                │ Domain A (Southern/Arid)  │ Domain B (Northern/Humid)         │
 ├────────────────────────┼───────────────────────────┼───────────────────────────────────┤
-│ Case 01: Europe        │ Iberian Peninsula [36-42°N]│ Southern Scandinavia [58-66°N]    │
+│ Case 01: Europe        │ Iberian Peninsula [36-42°N]│ Southern Scandinavia [58-66°N]   │
 │ Case 02: North America │ Colorado Basin [32-40°N]  │ Great Lakes Basin [41-48°N]       │
 │ Case 03: Global Sahel  │ Western Sahel [12-18°N]   │ Boreal Siberia [55-65°N]          │
 └────────────────────────┴───────────────────────────┴───────────────────────────────────┘
