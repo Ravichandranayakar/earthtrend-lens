@@ -250,26 +250,7 @@ npm run build --prefix frontend
 
 ---
 
-## 9. Official NASA Space Apps Submission Structure (7-Slide Deck)
-
-- **Slide 1: Title & The Environmental Detective Question**  
-  *EarthTrend Lens: Unmasking Asymmetric Planetary Trends (Team Synqora).*
-- **Slide 2: The Core Scientific Problem**  
-  *The Aggregation Fallacy and Seasonal Mirage; why dual-domain comparison is required.*
-- **Slide 3: NASA Earth Observation Datasets & Provenance**  
-  *GLDAS Noah 2.1 (0.25° Monthly, GES DISC) and NASA POWER / MERRA-2 Atmospheric Reanalysis.*
-- **Slide 4: The Comparative Forensic Raster Engine**  
-  *Cell-by-cell Theil-Sen median slopes and unified comparative color scales over GIS basemaps.*
-- **Slide 5: Climatological De-Seasonalization & Trend Detection**  
-  *24-year inter-annual anomalies and forensic polarities between Domain A and Domain B.*
-- **Slide 6: Scientific Rigor & Methodological Transparency**  
-  *Open-loop modeling disclosure, dynamic vegetation root depths, and non-causal boundaries.*
-- **Slide 7: Technical Architecture & Public Demonstration Link**  
-  *FastAPI + React/Leaflet architecture, open GitHub repository, and live demonstration.*
-
----
-
-## 10. License & Attribution
+## 9. License & Academic Attribution
 
 - **Project:** EarthTrend Lens
 - **Challenge:** NASA Space Apps Challenge 2026 — *Be An Earth System Trend Detective!*
