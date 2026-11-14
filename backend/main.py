@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
@@ -9,11 +10,19 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Enable CORS for frontend integration
+# Configure CORS: allow origins from ALLOWED_ORIGINS env, fallback to permissive for development
+allowed_origins_env = os.environ.get("ALLOWED_ORIGINS", "")
+if allowed_origins_env:
+    origins = [o.strip() for o in allowed_origins_env.split(",") if o.strip()]
+    allow_creds = True
+else:
+    origins = ["*"]
+    allow_creds = False
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=origins,
+    allow_credentials=allow_creds,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -28,9 +37,19 @@ def root():
         "challenge": "NASA Space Apps Challenge 2026 - Be An Earth System Trend Detective",
         "team": "Synqora",
         "docs_url": "/docs",
-        "api_v1": settings.API_V1_PREFIX
+        "api_v1": settings.API_V1_PREFIX,
+        "status": "online"
+    }
+
+@app.get("/health")
+def health():
+    return {
+        "status": "online",
+        "service": settings.PROJECT_NAME,
+        "version": "2.0.0"
     }
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=False)

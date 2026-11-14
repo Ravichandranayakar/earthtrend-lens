@@ -360,3 +360,12 @@ export async function fetchArchiveAudit(): Promise<ArchiveAuditResponse> {
   return resp.data;
 }
 
+export async function checkBackendHealth(): Promise<{ status: string; service?: string } | null> {
+  try {
+    const resp = await apiClient.get('/health', { timeout: 8000 });
+    return resp.data;
+  } catch {
+    return null;
+  }
+}
+

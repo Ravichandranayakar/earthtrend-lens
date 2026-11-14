@@ -1,0 +1,30 @@
+services:
+  # 1. Render Free Web Service: FastAPI Scientific Backend
+  - type: web
+    name: earthtrend-lens-backend
+    runtime: python
+    plan: free
+    region: oregon
+    rootDir: backend
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.3
+      - key: ALLOWED_ORIGINS
+        value: "*"
+
+  # 2. Render Static Site: React + Vite Frontend
+  - type: static
+    name: earthtrend-lens
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        value: https://earthtrend-lens-backend.onrender.com/api/v1

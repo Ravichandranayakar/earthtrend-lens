@@ -1,14 +1,22 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import React, { useEffect, useState, useCallback, useRef, Suspense } from 'react';
 import { Navbar, ActiveTab } from './components/Navbar';
 import { VariableSelector } from './components/investigation/VariableSelector';
 import { RegionPanel } from './components/investigation/RegionPanel';
 import { MapCanvas } from './components/investigation/MapCanvas';
 import { EarthDataExplorer } from './components/investigation/EarthDataExplorer';
-import { DeseasonalizerChart } from './components/DeseasonalizerChart';
 import { ForensicScorecard } from './components/ForensicScorecard';
 import { SpatialPolarityCard } from './components/SpatialPolarityCard';
-import { SpatialGridMap } from './components/SpatialGridMap';
-import { DataMethodsView } from './components/DataMethodsView';
+
+// Low-risk lazy loading for screen-specific heavy modules to split Plotly from the initial bundle
+const DeseasonalizerChart = React.lazy(() =>
+  import('./components/DeseasonalizerChart').then((m) => ({ default: m.DeseasonalizerChart }))
+);
+const SpatialGridMap = React.lazy(() =>
+  import('./components/SpatialGridMap').then((m) => ({ default: m.SpatialGridMap }))
+);
+const DataMethodsView = React.lazy(() =>
+  import('./components/DataMethodsView').then((m) => ({ default: m.DataMethodsView }))
+);
 import {
   AlertTriangle,
   RotateCcw,
@@ -21,6 +29,7 @@ import {
   fetchOppositeTrends,
   fetchSpatialGrid,
   fetchMeanRaster,
+  checkBackendHealth,
   PresetCase,
   VariableItem,
   OppositeTrendsResponse,
@@ -107,12 +116,26 @@ export function App() {
       }
 
       setError(null);
-    } catch {
-      setError('Unable to stream satellite observation data from the Earth analysis service. You can retry the connection or reload the application.');
-      // Schedule background auto-recovery attempt in 5 seconds
+    } catch (err: any) {
+      const isWakeUp =
+        err?.code === 'ECONNABORTED' ||
+        !err?.response ||
+        (err?.response && err.response.status >= 500);
+
+      if (isWakeUp) {
+        setError(
+          'Connecting to Render free compute backend (instance is waking up from sleep, typically takes 30-50s). Curated preset maps and cached investigations remain active.'
+        );
+      } else {
+        setError(
+          'Unable to stream satellite observation data from the Earth analysis service. You can retry the connection or reload the application.'
+        );
+      }
+
+      // Schedule background auto-recovery attempt in 8 seconds (giving Render spin-up time to complete)
       autoRetryTimerRef.current = window.setTimeout(() => {
         loadInitialData();
-      }, 5000);
+      }, 8000);
     } finally {
       setIsLoading(false);
       setIsGridLoading(false);
@@ -254,8 +277,28 @@ export function App() {
   const handleRunInvestigation = async () => {
     try {
       setIsLoading(true);
-      setIsGridLoading(true);
       setError(null);
+
+      // 1. Probe backend readiness before launching heavy multi-tile analysis
+      const health = await checkBackendHealth();
+      if (!health) {
+        setError(
+          'Render compute backend is initializing from free-tier sleep (~30-50s). Please hold on; analysis will begin once compute readiness is verified.'
+        );
+        // Wait 6 seconds and retry probe once
+        await new Promise((resolve) => setTimeout(resolve, 6000));
+        const retryHealth = await checkBackendHealth();
+        if (!retryHealth) {
+          setError(
+            'Backend compute node is still spinning up. Please wait a moment and click Run Investigation again.'
+          );
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      setError(null);
+      setIsGridLoading(true);
       const [data, gridA, gridB] = await Promise.all([
         fetchOppositeTrends(
           undefined,
@@ -779,7 +822,9 @@ export function App() {
                 </p>
               </div>
               <SpatialPolarityCard data={analysisData} />
-              <DeseasonalizerChart data={analysisData} />
+              <Suspense fallback={<div style={{ padding: 24, textAlign: 'center', color: 'var(--color-slate-text)', fontSize: 13, background: 'var(--color-white)', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)' }}>Loading timeseries chart engine...</div>}>
+                <DeseasonalizerChart data={analysisData} />
+              </Suspense>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                 <ForensicScorecard region={analysisData.region_a} colorTheme="crimson" />
                 <ForensicScorecard region={analysisData.region_b} colorTheme="teal" />
@@ -830,15 +875,17 @@ export function App() {
             </p>
           </div>
           {gridDataA || gridDataB ? (
-            <SpatialGridMap
-              gridDataA={gridDataA}
-              gridDataB={gridDataB}
-              bboxA={bboxA}
-              bboxB={bboxB}
-              regionAName={regionAName}
-              regionBName={regionBName}
-              isLoading={isGridLoading}
-            />
+            <Suspense fallback={<div style={{ padding: 24, textAlign: 'center', color: 'var(--color-slate-text)', fontSize: 13 }}>Loading spatial grid telemetry...</div>}>
+              <SpatialGridMap
+                gridDataA={gridDataA}
+                gridDataB={gridDataB}
+                bboxA={bboxA}
+                bboxB={bboxB}
+                regionAName={regionAName}
+                regionBName={regionBName}
+                isLoading={isGridLoading}
+              />
+            </Suspense>
           ) : (
             <EmptyAnalysis onGoInvestigate={() => setActiveTab('investigate')} />
           )}
@@ -880,7 +927,9 @@ export function App() {
               Open-science transparency: dataset provenance, statistical formulations, and reproducible methodology.
             </p>
           </div>
-          <DataMethodsView currentAnalysis={analysisData} />
+          <Suspense fallback={<div style={{ padding: 24, textAlign: 'center', color: 'var(--color-slate-text)', fontSize: 13 }}>Loading methodology and provenance...</div>}>
+            <DataMethodsView currentAnalysis={analysisData} />
+          </Suspense>
         </main>
       )}
 

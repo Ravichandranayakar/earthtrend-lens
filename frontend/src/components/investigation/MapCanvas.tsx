@@ -6,6 +6,7 @@ import {
   DualRasterResponse,
   fetchDualScientificRasters,
 } from '../../services/api';
+import { getCuratedDualRaster } from '../../data/curatedCatalog';
 
 export type BBoxTuple = [number, number, number, number]; // [minLat, maxLat, minLon, maxLon]
 export type BasemapMode = 'geography' | 'satellite';
@@ -353,6 +354,14 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
     setIsRasterLoading(true);
     setRasterError(null);
 
+    // 4a. Immediate zero-latency resolution for verified curated presets
+    const curated = getCuratedDualRaster(bboxA, bboxB, activeVariable, activeMode);
+    if (curated) {
+      setDualRasterData(curated);
+      setIsRasterLoading(false);
+      return;
+    }
+
     try {
       const dual = await fetchDualScientificRasters({
         bbox_a: bboxA,
@@ -414,6 +423,8 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
       if (!raster.raster_url || !raster.leaflet_bounds) return;
 
       const fullUrl = raster.raster_url.startsWith('http')
+        ? raster.raster_url
+        : raster.raster_url.startsWith('/curated_rasters/')
         ? raster.raster_url
         : `${apiServer}${raster.raster_url}`;
 
