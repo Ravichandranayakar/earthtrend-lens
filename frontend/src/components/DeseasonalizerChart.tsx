@@ -28,7 +28,7 @@ export const DeseasonalizerChart: React.FC<DeseasonalizerChartProps> = ({ data }
       y: monthlyA.map((m) => m.observed),
       mode: 'lines',
       name: `${regA.name} (Raw Monthly)`,
-      line: { color: '#EF4444', width: 1.5 },
+      line: { color: '#dc2626', width: 1.5 },
       opacity: 0.85,
     });
 
@@ -37,7 +37,7 @@ export const DeseasonalizerChart: React.FC<DeseasonalizerChartProps> = ({ data }
       y: monthlyB.map((m) => m.observed),
       mode: 'lines',
       name: `${regB.name} (Raw Monthly)`,
-      line: { color: '#14B8A6', width: 1.5 },
+      line: { color: '#0284c7', width: 1.5 },
       opacity: 0.85,
     });
   } else if (viewMode === 'deseasonalized') {
@@ -50,7 +50,7 @@ export const DeseasonalizerChart: React.FC<DeseasonalizerChartProps> = ({ data }
       y: monthlyA.map((m) => m.anomaly),
       mode: 'lines',
       name: `${regA.name} (Monthly Anomaly)`,
-      line: { color: '#EF4444', width: 2 },
+      line: { color: '#dc2626', width: 1.8 },
     });
 
     traces.push({
@@ -58,7 +58,7 @@ export const DeseasonalizerChart: React.FC<DeseasonalizerChartProps> = ({ data }
       y: monthlyB.map((m) => m.anomaly),
       mode: 'lines',
       name: `${regB.name} (Monthly Anomaly)`,
-      line: { color: '#14B8A6', width: 2 },
+      line: { color: '#0284c7', width: 1.8 },
     });
   } else {
     // Annual Aggregates + Sen's Slope Lines
@@ -77,8 +77,8 @@ export const DeseasonalizerChart: React.FC<DeseasonalizerChartProps> = ({ data }
       y: annualA.map((a) => a.annual_mean),
       mode: 'markers+lines',
       name: `${regA.name} (Observed Annual)`,
-      marker: { color: '#EF4444', size: 6 },
-      line: { color: '#EF4444', width: 1.5, dash: 'dot' },
+      marker: { color: '#dc2626', size: 6 },
+      line: { color: '#dc2626', width: 1.5, dash: 'dot' },
     });
 
     // Sen's slope trendline for A
@@ -86,8 +86,8 @@ export const DeseasonalizerChart: React.FC<DeseasonalizerChartProps> = ({ data }
       x: yearsA,
       y: yearsA.map((y) => statsA.sens_intercept + statsA.sens_slope * y),
       mode: 'lines',
-      name: `${regA.name} (Sen's Slope: ${statsA.sens_slope > 0 ? '+' : ''}${statsA.sens_slope}/yr)`,
-      line: { color: '#F87171', width: 3 },
+      name: `${regA.name} (Sen: ${statsA.sens_slope > 0 ? '+' : ''}${statsA.sens_slope}/yr)`,
+      line: { color: '#991b1b', width: 2.8 },
     });
 
     // Actual observed annual means for B
@@ -96,8 +96,8 @@ export const DeseasonalizerChart: React.FC<DeseasonalizerChartProps> = ({ data }
       y: annualB.map((b) => b.annual_mean),
       mode: 'markers+lines',
       name: `${regB.name} (Observed Annual)`,
-      marker: { color: '#14B8A6', size: 6 },
-      line: { color: '#14B8A6', width: 1.5, dash: 'dot' },
+      marker: { color: '#0284c7', size: 6 },
+      line: { color: '#0284c7', width: 1.5, dash: 'dot' },
     });
 
     // Sen's slope trendline for B
@@ -105,94 +105,94 @@ export const DeseasonalizerChart: React.FC<DeseasonalizerChartProps> = ({ data }
       x: yearsB,
       y: yearsB.map((y) => statsB.sens_intercept + statsB.sens_slope * y),
       mode: 'lines',
-      name: `${regB.name} (Sen's Slope: ${statsB.sens_slope > 0 ? '+' : ''}${statsB.sens_slope}/yr)`,
-      line: { color: '#2DD4BF', width: 3 },
+      name: `${regB.name} (Sen: ${statsB.sens_slope > 0 ? '+' : ''}${statsB.sens_slope}/yr)`,
+      line: { color: '#0369a1', width: 2.8 },
     });
   }
 
   return (
-    <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl flex flex-col gap-4">
+    <div className="bg-white border border-slate-200/80 rounded-xl p-5 shadow-xs flex flex-col gap-4">
       {/* Chart Header & Mode Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
         <div>
           <div className="flex items-center gap-2">
-            <SlidersHorizontal className="w-4 h-4 text-teal-400" />
-            <h2 className="text-base font-bold text-white tracking-tight">
+            <SlidersHorizontal className="w-4 h-4 text-teal-600" />
+            <h2 className="text-base font-bold text-slate-900 tracking-tight">
               Synchronized Divergent Time Series
             </h2>
           </div>
-          <p className="text-xs text-slate-400">
-            Variable: <span className="font-semibold text-slate-200">{data.variable}</span> ({data.unit}) • Timeline:{' '}
+          <p className="text-xs text-slate-500">
+            Variable: <span className="font-semibold text-slate-800">{data.variable}</span> ({data.unit}) • Timeline:{' '}
             {data.time_range[0]} – {data.time_range[1]}
           </p>
         </div>
 
-        {/* The Seasonal De-Noiser Mode Selector */}
-        <div className="inline-flex rounded-lg bg-slate-950 p-1 border border-slate-800 self-start sm:self-auto">
+        {/* View Mode Selector */}
+        <div className="inline-flex rounded-lg bg-slate-100 p-0.5 border border-slate-200 self-start sm:self-auto">
           <button
             onClick={() => setViewMode('annual_trend')}
-            className={`text-xs px-3 py-1.5 rounded-md font-medium transition-all ${
+            className={`text-xs px-3 py-1.5 rounded-md font-semibold transition-all cursor-pointer ${
               viewMode === 'annual_trend'
-                ? 'bg-teal-600 text-white shadow-sm'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-white text-slate-900 shadow-xs'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            Sen's Trend & Annual
+            Theil-Sen Annual Trend
           </button>
           <button
             onClick={() => setViewMode('deseasonalized')}
-            className={`text-xs px-3 py-1.5 rounded-md font-medium transition-all ${
+            className={`text-xs px-3 py-1.5 rounded-md font-semibold transition-all cursor-pointer ${
               viewMode === 'deseasonalized'
-                ? 'bg-teal-600 text-white shadow-sm'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-white text-slate-900 shadow-xs'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             De-seasonalized Anomaly
           </button>
           <button
             onClick={() => setViewMode('raw_seasonal')}
-            className={`text-xs px-3 py-1.5 rounded-md font-medium transition-all ${
+            className={`text-xs px-3 py-1.5 rounded-md font-semibold transition-all cursor-pointer ${
               viewMode === 'raw_seasonal'
-                ? 'bg-teal-600 text-white shadow-sm'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-white text-slate-900 shadow-xs'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            Raw Monthly Jitter
+            Raw Monthly
           </button>
         </div>
       </div>
 
-      {/* Explanatory callout for judges */}
-      <div className="bg-slate-950/60 border border-slate-800/80 rounded-xl px-4 py-2.5 flex items-start gap-2.5">
-        <Info className="w-4 h-4 text-teal-400 mt-0.5 flex-shrink-0" />
-        <p className="text-xs text-slate-300 leading-relaxed">
+      {/* Scientific context callout */}
+      <div className="bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2 flex items-start gap-2.5">
+        <Info className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
+        <p className="text-xs text-slate-600 leading-relaxed">
           {viewMode === 'raw_seasonal' && (
             <span>
-              <strong>The Seasonal Mirage:</strong> Raw monthly observations exhibit strong annual oscillations. Without removing the 24-year seasonal baseline, short-term weather noise masks underlying multi-decadal climate trajectories.
+              <strong>The Seasonal Cycle:</strong> Displays raw monthly observations exhibiting strong seasonal solar oscillations.
             </span>
           )}
           {viewMode === 'deseasonalized' && (
             <span>
-              <strong>De-Seasonalized Anomaly Engine:</strong> Each month's 24-year climatological mean is subtracted [ΔX = Observed - Climatology], isolating pure inter-annual drift.
+              <strong>De-Seasonalized Anomaly Engine:</strong> Each month's 24-year climatological mean is subtracted [ΔX = Observed - Climatology], isolating pure inter-annual hydrological drift.
             </span>
           )}
           {viewMode === 'annual_trend' && (
             <span>
-              <strong>Theil-Sen Monotonic Divergence:</strong> Non-parametric median slope lines eliminate outlier bias. Notice the polar opposite directions of the two regions under the identical global forcing.
+              <strong>Theil-Sen Monotonic Divergence:</strong> Non-parametric median slope lines eliminate outlier bias. Notice the opposing trajectories between the two domains under identical macro-forcing.
             </span>
           )}
         </p>
       </div>
 
       {/* Plotly Canvas */}
-      <div className="w-full h-[400px]">
+      <div className="w-full h-[380px]">
         <Plot
           data={traces}
           layout={{
             autosize: true,
-            paper_bgcolor: 'transparent',
-            plot_bgcolor: 'transparent',
-            margin: { l: 50, r: 20, t: 20, b: 50 },
+            paper_bgcolor: '#ffffff',
+            plot_bgcolor: '#f8fafc',
+            margin: { l: 55, r: 25, t: 25, b: 45 },
             showlegend: true,
             legend: {
               orientation: 'h',
@@ -200,20 +200,20 @@ export const DeseasonalizerChart: React.FC<DeseasonalizerChartProps> = ({ data }
               y: 1.02,
               xanchor: 'right',
               x: 1,
-              font: { color: '#94A3B8', size: 11 },
+              font: { color: '#475569', size: 11 },
             },
             xaxis: {
-              gridcolor: '#1E293B',
-              zerolinecolor: '#334155',
-              tickfont: { color: '#94A3B8' },
+              gridcolor: '#e2e8f0',
+              zerolinecolor: '#cbd5e1',
+              tickfont: { color: '#64748b' },
             },
             yaxis: {
-              gridcolor: '#1E293B',
-              zerolinecolor: '#334155',
-              tickfont: { color: '#94A3B8' },
+              gridcolor: '#e2e8f0',
+              zerolinecolor: '#cbd5e1',
+              tickfont: { color: '#64748b' },
               title: {
                 text: `${data.variable} (${data.unit})`,
-                font: { color: '#94A3B8', size: 12 },
+                font: { color: '#475569', size: 12 },
               },
             },
           }}

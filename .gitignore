@@ -19,8 +19,8 @@ frontend/dist-ssr/
 *.nc4
 *.hdf
 *.h5
-app/data/
-app/cache/
+backend/app/data/
+backend/app/cache/
 
 # IDE & OS
 .vscode/

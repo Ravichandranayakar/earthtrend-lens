@@ -125,3 +125,28 @@ def compute_mann_kendall_and_sens_slope(
             "r_squared": round(ols_r_squared, 4)
         }
     }
+
+
+def compute_benjamini_hochberg_fdr(p_values: List[float]) -> List[float]:
+    """
+    Computes Benjamini-Hochberg False Discovery Rate (FDR) adjusted q-values.
+    Controls the expected proportion of false discoveries across multiple hypothesis tests.
+    q(i) = min(1.0, min_{k >= i} (m / k * p(k)))
+    """
+    m = len(p_values)
+    if m == 0:
+        return []
+
+    sorted_indices = np.argsort(p_values)
+    sorted_p = np.array(p_values)[sorted_indices]
+
+    k = np.arange(1, m + 1)
+    raw_q = (m / k) * sorted_p
+
+    q_vals_sorted = np.minimum.accumulate(raw_q[::-1])[::-1]
+    q_vals_sorted = np.clip(q_vals_sorted, 0.0, 1.0)
+
+    q_values = np.empty(m)
+    q_values[sorted_indices] = q_vals_sorted
+    return [round(float(q), 5) for q in q_values]
+

@@ -13,31 +13,29 @@ export const ForensicScorecard: React.FC<ForensicScorecardProps> = ({ region, co
 
   return (
     <div
-      className={`rounded-2xl border p-5 flex flex-col justify-between transition-all duration-200 ${
-        isCrimson
-          ? 'bg-red-950/20 border-red-900/60 shadow-lg shadow-red-950/20'
-          : 'bg-teal-950/20 border-teal-900/60 shadow-lg shadow-teal-950/20'
+      className={`rounded-xl border p-5 flex flex-col justify-between transition-all bg-white shadow-xs ${
+        isCrimson ? 'border-red-200/80' : 'border-teal-200/80'
       }`}
     >
       <div>
         {/* Header */}
-        <div className="flex items-center justify-between gap-2 border-b border-slate-800/80 pb-3 mb-3">
+        <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-3 mb-3">
           <div>
             <span
               className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full border ${
                 isCrimson
-                  ? 'bg-red-950 text-red-300 border-red-800'
-                  : 'bg-teal-950 text-teal-300 border-teal-800'
+                  ? 'bg-red-50 text-red-800 border-red-200'
+                  : 'bg-teal-50 text-teal-800 border-teal-200'
               }`}
             >
-              {isCrimson ? 'Zone Alpha' : 'Zone Beta'}
+              {isCrimson ? 'Domain Alpha' : 'Domain Beta'}
             </span>
-            <h3 className="text-base font-bold text-white mt-1">{region.name}</h3>
+            <h3 className="text-base font-bold text-slate-900 mt-1">{region.name}</h3>
           </div>
 
           <div
-            className={`w-9 h-9 rounded-xl flex items-center justify-center ${
-              stats.sens_slope > 0 ? 'bg-teal-500/10 text-teal-400' : 'bg-red-500/10 text-red-400'
+            className={`w-9 h-9 rounded-lg flex items-center justify-center ${
+              stats.sens_slope > 0 ? 'bg-sky-50 text-sky-700' : 'bg-red-50 text-red-700'
             }`}
           >
             {stats.sens_slope > 0 ? (
@@ -49,47 +47,50 @@ export const ForensicScorecard: React.FC<ForensicScorecardProps> = ({ region, co
         </div>
 
         {/* Primary Metric: Sen's Slope */}
-        <div className="bg-slate-950/70 border border-slate-800/80 rounded-xl p-3 mb-3">
-          <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
-            <span>Sen's Robust Slope Rate</span>
-            <span className="text-[11px] font-mono text-slate-500">Theil-Sen (1950)</span>
+        <div className="bg-slate-50/70 border border-slate-200 rounded-lg p-3.5 mb-3">
+          <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
+            <span className="font-semibold text-slate-700">Theil-Sen Median Slope Rate</span>
+            <span className="text-[10px] font-mono text-slate-400">Robust Estimator</span>
           </div>
           <div className="flex items-baseline gap-2">
             <span
               className={`text-2xl font-extrabold tracking-tight font-mono ${
-                stats.sens_slope > 0 ? 'text-teal-400' : 'text-red-400'
+                stats.sens_slope > 0 ? 'text-sky-700' : 'text-red-700'
               }`}
             >
               {stats.sens_slope > 0 ? '+' : ''}
               {stats.sens_slope}
             </span>
-            <span className="text-xs text-slate-400">
+            <span className="text-xs font-semibold text-slate-600">
               {region.analysis.metadata.unit}/year
             </span>
+            <span className="text-xs text-slate-400 font-mono">
+              ({stats.sens_slope > 0 ? '+' : ''}{(stats.sens_slope * 10).toFixed(3)}/decade)
+            </span>
           </div>
-          <p className="text-[11px] text-slate-400 mt-1">
+          <p className="text-[11px] text-slate-500 mt-1">
             95% Confidence Interval: [{stats.confidence_interval_95[0]}, {stats.confidence_interval_95[1]}]
           </p>
         </div>
 
         {/* Statistical Significance Grid */}
         <div className="grid grid-cols-2 gap-2 mb-3">
-          <div className="bg-slate-950/60 border border-slate-800/80 rounded-xl p-2.5">
-            <span className="text-[10px] text-slate-400 uppercase tracking-wider block">
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-2.5">
+            <span className="text-[10px] text-slate-500 uppercase tracking-wider block font-semibold">
               Mann-Kendall Z
             </span>
-            <span className="text-sm font-bold font-mono text-slate-200">
+            <span className="text-sm font-bold font-mono text-slate-900">
               {stats.standardized_z > 0 ? '+' : ''}
               {stats.standardized_z}
             </span>
           </div>
-          <div className="bg-slate-950/60 border border-slate-800/80 rounded-xl p-2.5">
-            <span className="text-[10px] text-slate-400 uppercase tracking-wider block">
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-2.5">
+            <span className="text-[10px] text-slate-500 uppercase tracking-wider block font-semibold">
               p-value (Two-Tailed)
             </span>
             <span
               className={`text-sm font-bold font-mono ${
-                stats.is_significant ? 'text-emerald-400' : 'text-amber-400'
+                stats.is_significant ? 'text-emerald-700' : 'text-amber-700'
               }`}
             >
               {stats.p_value < 0.0001 ? '< 0.0001' : stats.p_value}
@@ -99,37 +100,37 @@ export const ForensicScorecard: React.FC<ForensicScorecardProps> = ({ region, co
 
         {/* Verdict Badge */}
         <div
-          className={`flex items-center gap-2 p-2.5 rounded-xl border text-xs font-semibold mb-3 ${
+          className={`flex items-center gap-2 p-2.5 rounded-lg border text-xs font-semibold mb-3 ${
             stats.is_significant
-              ? 'bg-emerald-950/30 border-emerald-800/60 text-emerald-300'
-              : 'bg-amber-950/30 border-amber-800/60 text-amber-300'
+              ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+              : 'bg-amber-50 border-amber-200 text-amber-800'
           }`}
         >
           {stats.is_significant ? (
-            <ShieldCheck className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+            <ShieldCheck className="w-4 h-4 text-emerald-600 flex-shrink-0" />
           ) : (
-            <AlertCircle className="w-4 h-4 text-amber-400 flex-shrink-0" />
+            <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0" />
           )}
           <span>
             {stats.is_significant
               ? 'STATISTICALLY SIGNIFICANT (p < 0.05)'
-              : 'DYNAMIC EQUILIBRIUM (p >= 0.05)'}
+              : 'DYNAMIC EQUILIBRIUM (p ≥ 0.05)'}
           </span>
         </div>
 
         {/* Verdict Description */}
-        <p className="text-xs text-slate-300 leading-relaxed bg-slate-950/50 p-3 rounded-xl border border-slate-800/60">
+        <p className="text-xs text-slate-600 leading-relaxed bg-slate-50/50 p-3 rounded-lg border border-slate-200/70">
           {stats.verdict_text}
         </p>
       </div>
 
-      {/* OLS Methodology Comparison (Judges love this) */}
-      <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
+      {/* OLS Sensitivity Benchmark */}
+      <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
         <div className="flex items-center gap-1.5">
-          <Scale className="w-3.5 h-3.5 text-slate-500" />
-          <span>Naive OLS comparison:</span>
+          <Scale className="w-3.5 h-3.5 text-slate-400" />
+          <span>OLS Sensitivity Check:</span>
         </div>
-        <span className="font-mono text-slate-300">
+        <span className="font-mono text-slate-700">
           {stats.ols_comparison.ols_slope > 0 ? '+' : ''}
           {stats.ols_comparison.ols_slope}/yr (R²={stats.ols_comparison.r_squared})
         </span>
