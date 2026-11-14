@@ -284,6 +284,15 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
     setValidationA(resA);
     setValidationB(resB);
 
+    // Position tooltips on outer lateral flanks (left/right) so central domain view and rasters are never obstructed
+    const centerLonA = (bboxA[2] + bboxA[3]) / 2;
+    const centerLonB = (bboxB[2] + bboxB[3]) / 2;
+    const isAWestOfB = centerLonA <= centerLonB;
+    const dirA: L.Direction = isAWestOfB ? 'left' : 'right';
+    const dirB: L.Direction = isAWestOfB ? 'right' : 'left';
+    const offsetA: L.PointExpression = isAWestOfB ? [-10, 0] : [10, 0];
+    const offsetB: L.PointExpression = isAWestOfB ? [10, 0] : [-10, 0];
+
     // Domain A (#B96F50 - Terracotta)
     if (resA.isValid && resA.leafletBounds) {
       const rectA = L.rectangle(resA.leafletBounds, {
@@ -298,7 +307,7 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
         `<span style="font-family: var(--font-mono); font-size: 10px; font-weight: 600; color: #B96F50; letter-spacing: 0.04em;">DOMAIN A${
           regionAName ? ` · ${regionAName}` : ''
         }</span>`,
-        { permanent: true, direction: 'top', className: 'domain-leaflet-tooltip' }
+        { permanent: true, direction: dirA, offset: offsetA, className: 'domain-leaflet-tooltip' }
       );
       domainGroup.addLayer(rectA);
     }
@@ -317,7 +326,7 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
         `<span style="font-family: var(--font-mono); font-size: 10px; font-weight: 600; color: #537D8C; letter-spacing: 0.04em;">DOMAIN B${
           regionBName ? ` · ${regionBName}` : ''
         }</span>`,
-        { permanent: true, direction: 'top', className: 'domain-leaflet-tooltip' }
+        { permanent: true, direction: dirB, offset: offsetB, className: 'domain-leaflet-tooltip' }
       );
       domainGroup.addLayer(rectB);
     }
@@ -1134,14 +1143,22 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
 
       <style>{`
         .domain-leaflet-tooltip {
-          background-color: #ffffff !important;
+          background-color: rgba(255, 255, 255, 0.96) !important;
           border: 1px solid var(--color-border) !important;
           border-radius: 4px !important;
-          box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08) !important;
-          padding: 2px 7px !important;
+          box-shadow: 0 1px 6px rgba(0, 0, 0, 0.10) !important;
+          padding: 3px 8px !important;
+          white-space: nowrap !important;
+          pointer-events: none !important;
         }
-        .domain-leaflet-tooltip::before {
+        .domain-leaflet-tooltip.leaflet-tooltip-top::before {
           border-top-color: var(--color-border) !important;
+        }
+        .domain-leaflet-tooltip.leaflet-tooltip-left::before {
+          border-left-color: var(--color-border) !important;
+        }
+        .domain-leaflet-tooltip.leaflet-tooltip-right::before {
+          border-right-color: var(--color-border) !important;
         }
       `}</style>
     </div>
