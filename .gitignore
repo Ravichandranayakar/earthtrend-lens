@@ -27,3 +27,6 @@ backend/app/cache/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Ephemeral scratch & temp files
+scratch/
