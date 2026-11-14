@@ -728,6 +728,8 @@ export function App() {
                 regionAName={regionAName}
                 regionBName={regionBName}
                 selectedPresetId={selectedPresetId}
+                selectedVariableId={selectedVariableId}
+                onSelectVariable={handleSelectVariable}
                 rasterData={rasterData}
               />
             </div>

@@ -74,21 +74,21 @@ class Settings(BaseSettings):
     PRESETS: Dict[str, Dict[str, Any]] = {
         "case_01_europe": {
             "id": "case_01_europe",
-            "title": "European Hydrological Polarity",
+            "title": "European Hydrological Comparison",
             "variable": "RootMoist_inst",
             "dataset": "GLDAS",
             "timeframe": [2000, 2024],
-            "narrative": "Under the same continental warming forcing, Southern Europe (Iberian Peninsula) experiences multi-decadal root-zone desiccation, while Northern Europe (Scandinavia) experiences accelerated moisture retention and runoff.",
+            "narrative": "Comparative European investigation: Evaluating GLDAS Noah 2.1 root-zone soil moisture trajectories across Mediterranean Southern Europe (Iberian Peninsula) and Boreal Northern Europe (Southern Scandinavia). GLDAS Noah 2.1 estimates indicate negative Theil-Sen root-zone soil-moisture slopes across 824 of 851 evaluated Iberian land cells during 2000-2024. These are descriptive model-based trend estimates; statistical significance and causal attribution have not been established.",
             "region_a": {
                 "id": "iberia",
                 "name": "Iberian Peninsula (Southern Europe)",
-                "expected_trend": "STATISTICALLY_SIGNIFICANT_DECREASING",
+                "expected_trend": "ESTIMATED_NEGATIVE_SLOPE",
                 "bbox": [36.0, 42.0, -9.0, 3.0]
             },
             "region_b": {
                 "id": "scandinavia",
                 "name": "Southern Scandinavia (Northern Europe)",
-                "expected_trend": "STATISTICALLY_SIGNIFICANT_INCREASING",
+                "expected_trend": "ESTIMATED_NEGATIVE_SLOPE",
                 "bbox": [58.0, 66.0, 10.0, 22.0]
             }
         },

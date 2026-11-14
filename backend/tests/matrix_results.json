@@ -1,0 +1,812 @@
+[
+  {
+    "preset_id": "case_01_europe",
+    "preset_name": "Europe Hydrology",
+    "domain_a_name": "Iberian Peninsula",
+    "domain_a_bbox": [
+      36.0,
+      42.0,
+      -9.0,
+      3.0
+    ],
+    "domain_b_name": "Southern Scandinavia",
+    "domain_b_bbox": [
+      58.0,
+      66.0,
+      10.0,
+      22.0
+    ],
+    "variable": "T2M",
+    "mode": "mean",
+    "t_run1": 2.275,
+    "t_run2": 7.774,
+    "error": null,
+    "status": "PASS",
+    "dataset_id": "NASA_POWER_MERRA2",
+    "provenance": "NASA_POWER_MERRA2",
+    "unit": "\u00b0C",
+    "dim_a": [
+      13,
+      19
+    ],
+    "dim_b": [
+      17,
+      20
+    ],
+    "valid_cells_a": 247,
+    "valid_cells_b": 340,
+    "mean_a": 15.965,
+    "mean_b": 4.2917,
+    "scale_type": "sequential",
+    "colormap": "Spectral_r",
+    "vmin": -1.62,
+    "vmax": 19.27,
+    "url_a": "/api/v1/raster/power_t2m_mean_1a7502ead2.png",
+    "url_b": "/api/v1/raster/power_t2m_mean_c7bddda4b0.png"
+  },
+  {
+    "preset_id": "case_01_europe",
+    "preset_name": "Europe Hydrology",
+    "domain_a_name": "Iberian Peninsula",
+    "domain_a_bbox": [
+      36.0,
+      42.0,
+      -9.0,
+      3.0
+    ],
+    "domain_b_name": "Southern Scandinavia",
+    "domain_b_bbox": [
+      58.0,
+      66.0,
+      10.0,
+      22.0
+    ],
+    "variable": "T2M",
+    "mode": "trend",
+    "t_run1": 13.751,
+    "t_run2": 12.135,
+    "error": null,
+    "status": "PASS",
+    "dataset_id": "NASA_POWER_MERRA2",
+    "provenance": "NASA_POWER_MERRA2",
+    "unit": "\u00b0C/yr",
+    "dim_a": [
+      13,
+      19
+    ],
+    "dim_b": [
+      17,
+      20
+    ],
+    "valid_cells_a": 247,
+    "valid_cells_b": 340,
+    "mean_a": 0.0531,
+    "mean_b": 0.0178,
+    "scale_type": "diverging",
+    "colormap": "RdBu_r",
+    "vmin": -0.0749,
+    "vmax": 0.0749,
+    "url_a": "/api/v1/raster/power_t2m_trend_f827676ebf.png",
+    "url_b": "/api/v1/raster/power_t2m_trend_41efff2873.png"
+  },
+  {
+    "preset_id": "case_01_europe",
+    "preset_name": "Europe Hydrology",
+    "domain_a_name": "Iberian Peninsula",
+    "domain_a_bbox": [
+      36.0,
+      42.0,
+      -9.0,
+      3.0
+    ],
+    "domain_b_name": "Southern Scandinavia",
+    "domain_b_bbox": [
+      58.0,
+      66.0,
+      10.0,
+      22.0
+    ],
+    "variable": "PRECTOTCORR",
+    "mode": "mean",
+    "t_run1": 2.388,
+    "t_run2": 2.325,
+    "error": null,
+    "status": "PASS",
+    "dataset_id": "NASA_POWER_MERRA2",
+    "provenance": "NASA_POWER_MERRA2",
+    "unit": "mm/day",
+    "dim_a": [
+      13,
+      19
+    ],
+    "dim_b": [
+      17,
+      20
+    ],
+    "valid_cells_a": 247,
+    "valid_cells_b": 340,
+    "mean_a": 1.3772,
+    "mean_b": 2.5495,
+    "scale_type": "sequential",
+    "colormap": "YlGnBu",
+    "vmin": 0.63,
+    "vmax": 5.66,
+    "url_a": "/api/v1/raster/power_prectotcorr_mean_355001d184.png",
+    "url_b": "/api/v1/raster/power_prectotcorr_mean_98b3a9b699.png"
+  },
+  {
+    "preset_id": "case_01_europe",
+    "preset_name": "Europe Hydrology",
+    "domain_a_name": "Iberian Peninsula",
+    "domain_a_bbox": [
+      36.0,
+      42.0,
+      -9.0,
+      3.0
+    ],
+    "domain_b_name": "Southern Scandinavia",
+    "domain_b_bbox": [
+      58.0,
+      66.0,
+      10.0,
+      22.0
+    ],
+    "variable": "PRECTOTCORR",
+    "mode": "trend",
+    "t_run1": 12.27,
+    "t_run2": 12.058,
+    "error": null,
+    "status": "PASS",
+    "dataset_id": "NASA_POWER_MERRA2",
+    "provenance": "NASA_POWER_MERRA2",
+    "unit": "(mm/day)/yr",
+    "dim_a": [
+      13,
+      19
+    ],
+    "dim_b": [
+      17,
+      20
+    ],
+    "valid_cells_a": 247,
+    "valid_cells_b": 340,
+    "mean_a": -0.0052,
+    "mean_b": -0.0024,
+    "scale_type": "diverging",
+    "colormap": "BrBG",
+    "vmin": -0.0448,
+    "vmax": 0.0448,
+    "url_a": "/api/v1/raster/power_prectotcorr_trend_909a9787f5.png",
+    "url_b": "/api/v1/raster/power_prectotcorr_trend_13ae0e8d3c.png"
+  },
+  {
+    "preset_id": "case_01_europe",
+    "preset_name": "Europe Hydrology",
+    "domain_a_name": "Iberian Peninsula",
+    "domain_a_bbox": [
+      36.0,
+      42.0,
+      -9.0,
+      3.0
+    ],
+    "domain_b_name": "Southern Scandinavia",
+    "domain_b_bbox": [
+      58.0,
+      66.0,
+      10.0,
+      22.0
+    ],
+    "variable": "RootMoist_inst",
+    "mode": "mean",
+    "t_run1": 2.337,
+    "t_run2": 2.335,
+    "error": null,
+    "status": "PASS",
+    "dataset_id": "GLDAS_NOAH025_M_2.1",
+    "provenance": "NASA_GLDAS_NETCDF",
+    "unit": "kg/m\u00b2",
+    "dim_a": [
+      26,
+      50
+    ],
+    "dim_b": [
+      34,
+      50
+    ],
+    "valid_cells_a": 851,
+    "valid_cells_b": 1176,
+    "mean_a": 242.7277,
+    "mean_b": 499.3786,
+    "scale_type": "sequential",
+    "colormap": "YlGnBu",
+    "vmin": 30.5299,
+    "vmax": 629.0165,
+    "url_a": "/api/v1/raster/gldas_rootmoist_inst_mean_fbae5bf083.png",
+    "url_b": "/api/v1/raster/gldas_rootmoist_inst_mean_689a7c3b96.png"
+  },
+  {
+    "preset_id": "case_01_europe",
+    "preset_name": "Europe Hydrology",
+    "domain_a_name": "Iberian Peninsula",
+    "domain_a_bbox": [
+      36.0,
+      42.0,
+      -9.0,
+      3.0
+    ],
+    "domain_b_name": "Southern Scandinavia",
+    "domain_b_bbox": [
+      58.0,
+      66.0,
+      10.0,
+      22.0
+    ],
+    "variable": "RootMoist_inst",
+    "mode": "trend",
+    "t_run1": 2.284,
+    "t_run2": 2.368,
+    "error": null,
+    "status": "PASS",
+    "dataset_id": "GLDAS_NOAH025_M_2.1",
+    "provenance": "NASA_GLDAS_NETCDF",
+    "unit": "(kg/m\u00b2)/yr",
+    "dim_a": [
+      26,
+      50
+    ],
+    "dim_b": [
+      34,
+      50
+    ],
+    "valid_cells_a": 851,
+    "valid_cells_b": 1176,
+    "mean_a": -1.0966,
+    "mean_b": -0.9657,
+    "scale_type": "diverging",
+    "colormap": "BrBG",
+    "vmin": -7.13,
+    "vmax": 7.13,
+    "url_a": "/api/v1/raster/gldas_rootmoist_inst_trend_193c439fc3.png",
+    "url_b": "/api/v1/raster/gldas_rootmoist_inst_trend_a5bf18f4a5.png"
+  },
+  {
+    "preset_id": "case_02_north_america",
+    "preset_name": "US Megadrought",
+    "domain_a_name": "Colorado Basin",
+    "domain_a_bbox": [
+      32.0,
+      40.0,
+      -115.0,
+      -105.0
+    ],
+    "domain_b_name": "Great Lakes",
+    "domain_b_bbox": [
+      41.0,
+      48.0,
+      -85.0,
+      -72.0
+    ],
+    "variable": "T2M",
+    "mode": "mean",
+    "t_run1": 2.42,
+    "t_run2": 2.394,
+    "error": null,
+    "status": "PASS",
+    "dataset_id": "NASA_POWER_MERRA2",
+    "provenance": "NASA_POWER_MERRA2",
+    "unit": "\u00b0C",
+    "dim_a": [
+      17,
+      17
+    ],
+    "dim_b": [
+      15,
+      21
+    ],
+    "valid_cells_a": 289,
+    "valid_cells_b": 315,
+    "mean_a": 12.6563,
+    "mean_b": 6.554,
+    "scale_type": "sequential",
+    "colormap": "Spectral_r",
+    "vmin": -0.63,
+    "vmax": 23.76,
+    "url_a": "/api/v1/raster/power_t2m_mean_144913f5ea.png",
+    "url_b": "/api/v1/raster/power_t2m_mean_7396db5021.png"
+  },
+  {
+    "preset_id": "case_02_north_america",
+    "preset_name": "US Megadrought",
+    "domain_a_name": "Colorado Basin",
+    "domain_a_bbox": [
+      32.0,
+      40.0,
+      -115.0,
+      -105.0
+    ],
+    "domain_b_name": "Great Lakes",
+    "domain_b_bbox": [
+      41.0,
+      48.0,
+      -85.0,
+      -72.0
+    ],
+    "variable": "T2M",
+    "mode": "trend",
+    "t_run1": 12.065,
+    "t_run2": 13.431,
+    "error": null,
+    "status": "PASS",
+    "dataset_id": "NASA_POWER_MERRA2",
+    "provenance": "NASA_POWER_MERRA2",
+    "unit": "\u00b0C/yr",
+    "dim_a": [
+      17,
+      17
+    ],
+    "dim_b": [
+      15,
+      21
+    ],
+    "valid_cells_a": 289,
+    "valid_cells_b": 315,
+    "mean_a": 0.0288,
+    "mean_b": 0.0502,
+    "scale_type": "diverging",
+    "colormap": "RdBu_r",
+    "vmin": -0.1028,
+    "vmax": 0.1028,
+    "url_a": "/api/v1/raster/power_t2m_trend_24835fff1a.png",
+    "url_b": "/api/v1/raster/power_t2m_trend_2af9d2b44a.png"
+  },
+  {
+    "preset_id": "case_02_north_america",
+    "preset_name": "US Megadrought",
+    "domain_a_name": "Colorado Basin",
+    "domain_a_bbox": [
+      32.0,
+      40.0,
+      -115.0,
+      -105.0
+    ],
+    "domain_b_name": "Great Lakes",
+    "domain_b_bbox": [
+      41.0,
+      48.0,
+      -85.0,
+      -72.0
+    ],
+    "variable": "PRECTOTCORR",
+    "mode": "mean",
+    "t_run1": 2.374,
+    "t_run2": 2.442,
+    "error": null,
+    "status": "PASS",
+    "dataset_id": "NASA_POWER_MERRA2",
+    "provenance": "NASA_POWER_MERRA2",
+    "unit": "mm/day",
+    "dim_a": [
+      17,
+      17
+    ],
+    "dim_b": [
+      15,
+      21
+    ],
+    "valid_cells_a": 289,
+    "valid_cells_b": 315,
+    "mean_a": 0.8471,
+    "mean_b": 2.5183,
+    "scale_type": "sequential",
+    "colormap": "YlGnBu",
+    "vmin": 0.2,
+    "vmax": 3.49,
+    "url_a": "/api/v1/raster/power_prectotcorr_mean_0df9b4bfef.png",
+    "url_b": "/api/v1/raster/power_prectotcorr_mean_f439498964.png"
+  },
+  {
+    "preset_id": "case_02_north_america",
+    "preset_name": "US Megadrought",
+    "domain_a_name": "Colorado Basin",
+    "domain_a_bbox": [
+      32.0,
+      40.0,
+      -115.0,
+      -105.0
+    ],
+    "domain_b_name": "Great Lakes",
+    "domain_b_bbox": [
+      41.0,
+      48.0,
+      -85.0,
+      -72.0
+    ],
+    "variable": "PRECTOTCORR",
+    "mode": "trend",
+    "t_run1": 14.263,
+    "t_run2": 13.822,
+    "error": null,
+    "status": "PASS",
+    "dataset_id": "NASA_POWER_MERRA2",
+    "provenance": "NASA_POWER_MERRA2",
+    "unit": "(mm/day)/yr",
+    "dim_a": [
+      17,
+      17
+    ],
+    "dim_b": [
+      15,
+      21
+    ],
+    "valid_cells_a": 289,
+    "valid_cells_b": 315,
+    "mean_a": 0.0001,
+    "mean_b": -0.0063,
+    "scale_type": "diverging",
+    "colormap": "BrBG",
+    "vmin": -0.0683,
+    "vmax": 0.0683,
+    "url_a": "/api/v1/raster/power_prectotcorr_trend_7e240c2c04.png",
+    "url_b": "/api/v1/raster/power_prectotcorr_trend_49a46b169a.png"
+  },
+  {
+    "preset_id": "case_02_north_america",
+    "preset_name": "US Megadrought",
+    "domain_a_name": "Colorado Basin",
+    "domain_a_bbox": [
+      32.0,
+      40.0,
+      -115.0,
+      -105.0
+    ],
+    "domain_b_name": "Great Lakes",
+    "domain_b_bbox": [
+      41.0,
+      48.0,
+      -85.0,
+      -72.0
+    ],
+    "variable": "RootMoist_inst",
+    "mode": "mean",
+    "t_run1": 2.434,
+    "t_run2": 2.309,
+    "error": null,
+    "status": "PASS",
+    "dataset_id": "GLDAS_NOAH025_M_2.1",
+    "provenance": "NASA_GLDAS_NETCDF",
+    "unit": "kg/m\u00b2",
+    "dim_a": [
+      34,
+      42
+    ],
+    "dim_b": [
+      30,
+      54
+    ],
+    "valid_cells_a": 1428,
+    "valid_cells_b": 1405,
+    "mean_a": 160.3233,
+    "mean_b": 451.253,
+    "scale_type": "sequential",
+    "colormap": "YlGnBu",
+    "vmin": 13.2823,
+    "vmax": 805.505,
+    "url_a": "/api/v1/raster/gldas_rootmoist_inst_mean_644e6216db.png",
+    "url_b": "/api/v1/raster/gldas_rootmoist_inst_mean_0d3ba59c0f.png"
+  },
+  {
+    "preset_id": "case_02_north_america",
+    "preset_name": "US Megadrought",
+    "domain_a_name": "Colorado Basin",
+    "domain_a_bbox": [
+      32.0,
+      40.0,
+      -115.0,
+      -105.0
+    ],
+    "domain_b_name": "Great Lakes",
+    "domain_b_bbox": [
+      41.0,
+      48.0,
+      -85.0,
+      -72.0
+    ],
+    "variable": "RootMoist_inst",
+    "mode": "trend",
+    "t_run1": 2.405,
+    "t_run2": 2.384,
+    "error": null,
+    "status": "PASS",
+    "dataset_id": "GLDAS_NOAH025_M_2.1",
+    "provenance": "NASA_GLDAS_NETCDF",
+    "unit": "(kg/m\u00b2)/yr",
+    "dim_a": [
+      34,
+      42
+    ],
+    "dim_b": [
+      30,
+      54
+    ],
+    "valid_cells_a": 1428,
+    "valid_cells_b": 1405,
+    "mean_a": -0.5907,
+    "mean_b": -0.9183,
+    "scale_type": "diverging",
+    "colormap": "BrBG",
+    "vmin": -8.1792,
+    "vmax": 8.1792,
+    "url_a": "/api/v1/raster/gldas_rootmoist_inst_trend_653c4a1243.png",
+    "url_b": "/api/v1/raster/gldas_rootmoist_inst_trend_0b77d018c2.png"
+  },
+  {
+    "preset_id": "case_03_global",
+    "preset_name": "Sahel vs Siberia",
+    "domain_a_name": "Western Sahel",
+    "domain_a_bbox": [
+      12.0,
+      18.0,
+      -15.0,
+      10.0
+    ],
+    "domain_b_name": "Boreal Siberia",
+    "domain_b_bbox": [
+      55.0,
+      65.0,
+      60.0,
+      90.0
+    ],
+    "variable": "T2M",
+    "mode": "mean",
+    "t_run1": 2.68,
+    "t_run2": 2.607,
+    "error": null,
+    "status": "PASS",
+    "dataset_id": "NASA_POWER_MERRA2",
+    "provenance": "NASA_POWER_MERRA2",
+    "unit": "\u00b0C",
+    "dim_a": [
+      13,
+      41
+    ],
+    "dim_b": [
+      21,
+      49
+    ],
+    "valid_cells_a": 533,
+    "valid_cells_b": 1029,
+    "mean_a": 28.2438,
+    "mean_b": -1.9869,
+    "scale_type": "sequential",
+    "colormap": "Spectral_r",
+    "vmin": -7.85,
+    "vmax": 29.73,
+    "url_a": "/api/v1/raster/power_t2m_mean_63212dcd88.png",
+    "url_b": "/api/v1/raster/power_t2m_mean_a8a0f70db2.png"
+  },
+  {
+    "preset_id": "case_03_global",
+    "preset_name": "Sahel vs Siberia",
+    "domain_a_name": "Western Sahel",
+    "domain_a_bbox": [
+      12.0,
+      18.0,
+      -15.0,
+      10.0
+    ],
+    "domain_b_name": "Boreal Siberia",
+    "domain_b_bbox": [
+      55.0,
+      65.0,
+      60.0,
+      90.0
+    ],
+    "variable": "T2M",
+    "mode": "trend",
+    "t_run1": 31.111,
+    "t_run2": 28.711,
+    "error": null,
+    "status": "PASS",
+    "dataset_id": "NASA_POWER_MERRA2",
+    "provenance": "NASA_POWER_MERRA2",
+    "unit": "\u00b0C/yr",
+    "dim_a": [
+      13,
+      41
+    ],
+    "dim_b": [
+      21,
+      49
+    ],
+    "valid_cells_a": 533,
+    "valid_cells_b": 1029,
+    "mean_a": -0.0174,
+    "mean_b": 0.0393,
+    "scale_type": "diverging",
+    "colormap": "RdBu_r",
+    "vmin": -0.0885,
+    "vmax": 0.0885,
+    "url_a": "/api/v1/raster/power_t2m_trend_d1ad2abc55.png",
+    "url_b": "/api/v1/raster/power_t2m_trend_26ae9fc317.png"
+  },
+  {
+    "preset_id": "case_03_global",
+    "preset_name": "Sahel vs Siberia",
+    "domain_a_name": "Western Sahel",
+    "domain_a_bbox": [
+      12.0,
+      18.0,
+      -15.0,
+      10.0
+    ],
+    "domain_b_name": "Boreal Siberia",
+    "domain_b_bbox": [
+      55.0,
+      65.0,
+      60.0,
+      90.0
+    ],
+    "variable": "PRECTOTCORR",
+    "mode": "mean",
+    "t_run1": 2.718,
+    "t_run2": 2.628,
+    "error": null,
+    "status": "PASS",
+    "dataset_id": "NASA_POWER_MERRA2",
+    "provenance": "NASA_POWER_MERRA2",
+    "unit": "mm/day",
+    "dim_a": [
+      13,
+      41
+    ],
+    "dim_b": [
+      21,
+      49
+    ],
+    "valid_cells_a": 533,
+    "valid_cells_b": 1029,
+    "mean_a": 1.4356,
+    "mean_b": 1.8836,
+    "scale_type": "sequential",
+    "colormap": "YlGnBu",
+    "vmin": 0.13,
+    "vmax": 4.7,
+    "url_a": "/api/v1/raster/power_prectotcorr_mean_9ee8c7a82e.png",
+    "url_b": "/api/v1/raster/power_prectotcorr_mean_422205b745.png"
+  },
+  {
+    "preset_id": "case_03_global",
+    "preset_name": "Sahel vs Siberia",
+    "domain_a_name": "Western Sahel",
+    "domain_a_bbox": [
+      12.0,
+      18.0,
+      -15.0,
+      10.0
+    ],
+    "domain_b_name": "Boreal Siberia",
+    "domain_b_bbox": [
+      55.0,
+      65.0,
+      60.0,
+      90.0
+    ],
+    "variable": "PRECTOTCORR",
+    "mode": "trend",
+    "t_run1": 30.863,
+    "t_run2": 32.054,
+    "error": null,
+    "status": "PASS",
+    "dataset_id": "NASA_POWER_MERRA2",
+    "provenance": "NASA_POWER_MERRA2",
+    "unit": "(mm/day)/yr",
+    "dim_a": [
+      13,
+      41
+    ],
+    "dim_b": [
+      21,
+      49
+    ],
+    "valid_cells_a": 533,
+    "valid_cells_b": 1029,
+    "mean_a": 0.0325,
+    "mean_b": 0.0056,
+    "scale_type": "diverging",
+    "colormap": "BrBG",
+    "vmin": -0.2369,
+    "vmax": 0.2369,
+    "url_a": "/api/v1/raster/power_prectotcorr_trend_3816bc43a1.png",
+    "url_b": "/api/v1/raster/power_prectotcorr_trend_903629785d.png"
+  },
+  {
+    "preset_id": "case_03_global",
+    "preset_name": "Sahel vs Siberia",
+    "domain_a_name": "Western Sahel",
+    "domain_a_bbox": [
+      12.0,
+      18.0,
+      -15.0,
+      10.0
+    ],
+    "domain_b_name": "Boreal Siberia",
+    "domain_b_bbox": [
+      55.0,
+      65.0,
+      60.0,
+      90.0
+    ],
+    "variable": "RootMoist_inst",
+    "mode": "mean",
+    "t_run1": 2.837,
+    "t_run2": 2.918,
+    "error": null,
+    "status": "PASS",
+    "dataset_id": "GLDAS_NOAH025_M_2.1",
+    "provenance": "NASA_GLDAS_NETCDF",
+    "unit": "kg/m\u00b2",
+    "dim_a": [
+      26,
+      102
+    ],
+    "dim_b": [
+      42,
+      122
+    ],
+    "valid_cells_a": 2652,
+    "valid_cells_b": 5081,
+    "mean_a": 150.4526,
+    "mean_b": 428.3257,
+    "scale_type": "sequential",
+    "colormap": "YlGnBu",
+    "vmin": 3.147,
+    "vmax": 713.6349,
+    "url_a": "/api/v1/raster/gldas_rootmoist_inst_mean_59a8c53e4a.png",
+    "url_b": "/api/v1/raster/gldas_rootmoist_inst_mean_e72731222c.png"
+  },
+  {
+    "preset_id": "case_03_global",
+    "preset_name": "Sahel vs Siberia",
+    "domain_a_name": "Western Sahel",
+    "domain_a_bbox": [
+      12.0,
+      18.0,
+      -15.0,
+      10.0
+    ],
+    "domain_b_name": "Boreal Siberia",
+    "domain_b_bbox": [
+      55.0,
+      65.0,
+      60.0,
+      90.0
+    ],
+    "variable": "RootMoist_inst",
+    "mode": "trend",
+    "t_run1": 2.917,
+    "t_run2": 2.947,
+    "error": null,
+    "status": "PASS",
+    "dataset_id": "GLDAS_NOAH025_M_2.1",
+    "provenance": "NASA_GLDAS_NETCDF",
+    "unit": "(kg/m\u00b2)/yr",
+    "dim_a": [
+      26,
+      102
+    ],
+    "dim_b": [
+      42,
+      122
+    ],
+    "valid_cells_a": 2652,
+    "valid_cells_b": 5081,
+    "mean_a": -0.1274,
+    "mean_b": -0.7504,
+    "scale_type": "diverging",
+    "colormap": "BrBG",
+    "vmin": -6.5148,
+    "vmax": 6.5148,
+    "url_a": "/api/v1/raster/gldas_rootmoist_inst_trend_3d2376ed71.png",
+    "url_b": "/api/v1/raster/gldas_rootmoist_inst_trend_eb78a0a9a2.png"
+  }
+]

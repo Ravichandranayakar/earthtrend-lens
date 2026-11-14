@@ -324,3 +324,8 @@ body {
 .js-plotly-plot .plotly .main-svg {
   background: transparent !important;
 }
+
+/* Smooth fade-in transition for scientific raster overlays */
+.scientific-raster-overlay {
+  transition: opacity 280ms ease-in-out !important;
+}

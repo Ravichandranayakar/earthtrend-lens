@@ -15,18 +15,6 @@ export interface STACCollection {
 
 const PLANETARY_STAC_CATALOG: STACCollection[] = [
   {
-    id: 'nasa-gldas',
-    title: 'NASA GLDAS Noah Land Surface Model 2.1',
-    category: 'Land Hydrology',
-    provider: 'NASA GES DISC / Goddard Space Flight Center',
-    resolution: '0.25° (~25–28 km)',
-    temporalCadence: 'Monthly',
-    timeRange: '2000 – 2024',
-    description: 'Model-assimilated soil moisture (root-zone and topsoil), surface runoff, and hydrological fluxes derived from satellite observations and ground telemetry.',
-    stacEndpoint: 'https://planetarycomputer.microsoft.com/api/stac/v1/collections/nasa-gldas',
-    assets: ['RootMoist_inst', 'SoilMoi0_10cm_inst', 'Rainf_f_tavg', 'Qair_f_inst'],
-  },
-  {
     id: 'sentinel-2-l2a',
     title: 'Sentinel-2 L2A Surface Reflectance',
     category: 'Satellite Imagery',
@@ -46,7 +34,7 @@ const PLANETARY_STAC_CATALOG: STACCollection[] = [
     resolution: '30m (Thermal resampled)',
     temporalCadence: '8–16 days',
     timeRange: '2013 – Present',
-    description: 'Atmospherically corrected surface reflectance and thermal infrared surface temperature (ST) data for decadal land-atmosphere interaction monitoring.',
+    description: 'Atmospherically corrected surface reflectance and thermal infrared surface temperature (ST) data for decadal land-atmosphere interaction monitoring. (Note: historical coverage prior to 2013 requires Landsat 5/7).',
     stacEndpoint: 'https://planetarycomputer.microsoft.com/api/stac/v1/collections/landsat-c2-l2',
     assets: ['ST_B10 (Surface Temperature)', 'SR_B4 (Red)', 'SR_B5 (NIR)', 'QA_PIXEL'],
   },
@@ -70,7 +58,7 @@ const PLANETARY_STAC_CATALOG: STACCollection[] = [
     resolution: '1000m (1 km)',
     temporalCadence: '8-day composite',
     timeRange: '2000 – Present',
-    description: 'Global daytime and nighttime land-surface temperature grids capturing multi-decadal heat accumulation, drought desiccation, and urban heat islands.',
+    description: 'Global daytime and nighttime radiative surface skin temperature grids capturing thermal heat accumulation (distinct from near-surface air temperature T2M).',
     stacEndpoint: 'https://planetarycomputer.microsoft.com/api/stac/v1/collections/modis-11A2-061',
     assets: ['LST_Day_1km', 'LST_Night_1km', 'QC_Day', 'Clear_sky_days'],
   },
@@ -83,12 +71,12 @@ interface EarthDataExplorerProps {
 
 export const EarthDataExplorer: React.FC<EarthDataExplorerProps> = ({
   onSelectDataset,
-  activeDatasetId = 'nasa-gldas',
+  activeDatasetId = 'sentinel-2-l2a',
 }) => {
   const [selectedId, setSelectedId] = useState<string>(activeDatasetId);
   const [activeCategory, setActiveCategory] = useState<string>('All');
 
-  const categories = ['All', 'Land Hydrology', 'Satellite Imagery', 'Thermal & Climate', 'Topography'];
+  const categories = ['All', 'Satellite Imagery', 'Thermal & Climate', 'Topography'];
 
   const filtered = activeCategory === 'All'
     ? PLANETARY_STAC_CATALOG

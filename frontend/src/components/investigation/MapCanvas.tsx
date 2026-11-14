@@ -1,11 +1,16 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { RasterResponse } from '../../services/api';
+import {
+  RasterResponse,
+  DualRasterResponse,
+  fetchDualScientificRasters,
+} from '../../services/api';
 
 export type BBoxTuple = [number, number, number, number]; // [minLat, maxLat, minLon, maxLon]
-
 export type BasemapMode = 'geography' | 'satellite';
+export type ScientificVariable = 'T2M' | 'PRECTOTCORR' | 'RootMoist_inst';
+export type ScientificMode = 'mean' | 'trend';
 
 interface MapCanvasProps {
   bboxA: BBoxTuple;
@@ -13,7 +18,10 @@ interface MapCanvasProps {
   regionAName: string;
   regionBName: string;
   selectedPresetId?: string;
+  selectedVariableId?: string;
   rasterData?: RasterResponse | null;
+  initialVariable?: ScientificVariable;
+  onSelectVariable?: (variableId: string) => void;
 }
 
 export interface BBoxValidationResult {
@@ -89,7 +97,10 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
   regionAName,
   regionBName,
   selectedPresetId,
-  rasterData,
+  selectedVariableId,
+  rasterData: initialRasterData,
+  initialVariable = 'T2M',
+  onSelectVariable,
 }) => {
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -103,14 +114,53 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
 
   const prevPresetIdRef = useRef<string | undefined>(selectedPresetId);
 
-  // Basemap & HUD States
+  // Basemap State
   const [basemapMode, setBasemapMode] = useState<BasemapMode>('geography');
   const [satelliteOpacity, setSatelliteOpacity] = useState<number>(0.85);
 
-  // Layer 03: Scientific Raster State
+  // Scientific Overlay States
   const [showScientificRaster, setShowScientificRaster] = useState<boolean>(true);
-  const [rasterOpacity, setRasterOpacity] = useState<number>(0.75);
+  const [rasterOpacity, setRasterOpacity] = useState<number>(0.80);
+  const [activeVariable, setActiveVariable] = useState<ScientificVariable>(() => {
+    if (selectedVariableId && (selectedVariableId === 'T2M' || selectedVariableId === 'PRECTOTCORR' || selectedVariableId === 'RootMoist_inst')) {
+      return selectedVariableId as ScientificVariable;
+    }
+    return initialVariable;
+  });
+  const [activeMode, setActiveMode] = useState<ScientificMode>('mean');
+  const [dualRasterData, setDualRasterData] = useState<DualRasterResponse | null>(null);
+  const [isRasterLoading, setIsRasterLoading] = useState<boolean>(false);
+  const [loadingElapsedSec, setLoadingElapsedSec] = useState<number>(0);
+  const [rasterError, setRasterError] = useState<string | null>(null);
+  const activeRequestIdRef = useRef<number>(0);
 
+  // Timer for transparent, honest elapsed time tracking during live calculations
+  useEffect(() => {
+    if (!isRasterLoading) {
+      setLoadingElapsedSec(0);
+      return;
+    }
+    const timer = window.setInterval(() => {
+      setLoadingElapsedSec((prev) => prev + 1);
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [isRasterLoading]);
+
+  // Synchronize when selectedVariableId prop changes
+  useEffect(() => {
+    if (selectedVariableId && (selectedVariableId === 'T2M' || selectedVariableId === 'PRECTOTCORR' || selectedVariableId === 'RootMoist_inst')) {
+      setActiveVariable(selectedVariableId as ScientificVariable);
+    }
+  }, [selectedVariableId]);
+
+  const handleVariableChange = (v: ScientificVariable) => {
+    setActiveVariable(v);
+    if (onSelectVariable) {
+      onSelectVariable(v);
+    }
+  };
+
+  // Coordinate tracking
   const [cursorCoords, setCursorCoords] = useState<{ lat: number; lon: number } | null>(null);
   const [currentZoom, setCurrentZoom] = useState<number>(2);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
@@ -123,32 +173,14 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
     normalizeAndValidateBBox(bboxB)
   );
 
-  // Fullscreen event listener
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      const isFs = !!document.fullscreenElement;
-      setIsFullscreen(isFs);
-      if (mapInstanceRef.current) {
-        setTimeout(() => {
-          mapInstanceRef.current?.invalidateSize();
-        }, 150);
-      }
-    };
-
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () => {
-      document.removeEventListener('fullscreenchange', handleFullscreenChange);
-    };
-  }, []);
-
   // 1. Initialize Leaflet Map (Safe against double-mount)
   useEffect(() => {
     if (!containerRef.current) return;
     if (mapInstanceRef.current) return;
 
     const map = L.map(containerRef.current, {
-      center: [25, 10],
-      zoom: 2,
+      center: [45, 10],
+      zoom: 3,
       minZoom: 1,
       maxZoom: 18,
       zoomControl: false,
@@ -165,18 +197,13 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
       })
       .addTo(map);
 
-    // Layer 01: Cartographic Base Layer (CARTO Positron if VITE_CARTO_API_KEY provided, else Esri Light Gray Canvas)
-    const cartoApiKey = import.meta.env.VITE_CARTO_API_KEY;
-    const baseLayerUrl = cartoApiKey
-      ? `https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png?api_key=${cartoApiKey}`
-      : 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}';
+    // Layer 01: Cartographic Base Layer (Esri Light Gray Canvas)
+    const baseLayerUrl =
+      'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}';
 
     const baseLayer = L.tileLayer(baseLayerUrl, {
       maxZoom: 18,
-      subdomains: cartoApiKey ? ['a', 'b', 'c', 'd'] : ['server'],
-      attribution: cartoApiKey
-        ? '&copy; OpenStreetMap contributors &copy; CARTO'
-        : 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ &copy; OpenStreetMap',
+      attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ &copy; OpenStreetMap',
     }).addTo(map);
     baseLayerRef.current = baseLayer;
 
@@ -222,14 +249,6 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
     });
     resizeObserver.observe(containerRef.current);
 
-    // Initial camera placement
-    const initialA = normalizeAndValidateBBox(bboxA);
-    const initialB = normalizeAndValidateBBox(bboxB);
-    if (initialA.isValid && initialA.leafletBounds && initialB.isValid && initialB.leafletBounds) {
-      const combined = initialA.leafletBounds.extend(initialB.leafletBounds);
-      map.fitBounds(combined, { padding: [50, 50], maxZoom: 6 });
-    }
-
     return () => {
       resizeObserver.disconnect();
       map.remove();
@@ -237,6 +256,7 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
       baseLayerRef.current = null;
       satelliteLayerRef.current = null;
       domainLayerGroupRef.current = null;
+      scientificLayerGroupRef.current = null;
     };
   }, []);
 
@@ -270,7 +290,7 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
         color: '#B96F50',
         weight: 2,
         fillColor: '#B96F50',
-        fillOpacity: 0.14,
+        fillOpacity: 0.10,
         dashArray: '5, 5',
       });
 
@@ -289,7 +309,7 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
         color: '#537D8C',
         weight: 2,
         fillColor: '#537D8C',
-        fillOpacity: 0.14,
+        fillOpacity: 0.10,
         dashArray: '5, 5',
       });
 
@@ -303,50 +323,121 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
     }
   }, [bboxA, bboxB, regionAName, regionBName]);
 
-  // 3b. Layer 03: Genuine Scientific Mean Raster (ImageOverlay)
+  // 4. Fetch Dual Scientific Rasters from Backend with Request Cancellation & Seamless State Retention
+  const loadScientificRasters = useCallback(async () => {
+    const resA = normalizeAndValidateBBox(bboxA);
+    const resB = normalizeAndValidateBBox(bboxB);
+    if (!resA.isValid || !resB.isValid) return;
+
+    const currentRequestId = ++activeRequestIdRef.current;
+    setIsRasterLoading(true);
+    setRasterError(null);
+
+    try {
+      const dual = await fetchDualScientificRasters({
+        bbox_a: bboxA,
+        bbox_b: bboxB,
+        variable: activeVariable,
+        mode: activeMode,
+      });
+
+      // Ignore stale response if a newer selection occurred
+      if (currentRequestId !== activeRequestIdRef.current) return;
+
+      if (dual.status === 'SUCCESS') {
+        setDualRasterData(dual);
+      } else {
+        setRasterError(dual.message || 'Scientific raster unavailable for this variable.');
+      }
+    } catch (err: any) {
+      if (currentRequestId !== activeRequestIdRef.current) return;
+      const serverMsg = err?.response?.data?.detail || err?.response?.data?.message;
+      if (err?.code === 'ECONNABORTED' || (err?.message && err.message.includes('timeout'))) {
+        setRasterError('Request timed out streaming multi-tile data from NASA service. Please retry stream.');
+      } else if (serverMsg && typeof serverMsg === 'string' && serverMsg.length > 5) {
+        setRasterError(serverMsg);
+      } else {
+        setRasterError(
+          activeVariable === 'RootMoist_inst'
+            ? 'Unable to stream NASA GLDAS Noah 2.1 soil moisture raster from backend.'
+            : 'Unable to stream scientific raster overlay from NASA POWER / MERRA-2 service.'
+        );
+      }
+    } finally {
+      if (currentRequestId === activeRequestIdRef.current) {
+        setIsRasterLoading(false);
+      }
+    }
+  }, [bboxA, bboxB, activeVariable, activeMode]);
+
+  useEffect(() => {
+    loadScientificRasters();
+  }, [loadScientificRasters]);
+
+  // 5. Render Paired Scientific Raster Overlays (Domain A and Domain B)
   useEffect(() => {
     const scientificGroup = scientificLayerGroupRef.current;
     if (!scientificGroup) return;
 
+    // Clear stale overlays before rendering new layers
     scientificGroup.clearLayers();
 
-    if (!showScientificRaster || !rasterData || rasterData.status !== 'SUCCESS') {
+    if (!showScientificRaster || !dualRasterData || dualRasterData.status !== 'SUCCESS') {
       return;
     }
 
-    if (rasterData.raster_url && rasterData.leaflet_bounds) {
-      const apiServer = (import.meta as any).env?.VITE_API_URL
-        ? (import.meta as any).env.VITE_API_URL.replace(/\/api\/v1\/?$/, '')
-        : 'http://localhost:8000';
-      const fullUrl = rasterData.raster_url.startsWith('http')
-        ? rasterData.raster_url
-        : `${apiServer}${rasterData.raster_url}`;
+    const apiServer = (import.meta as any).env?.VITE_API_URL
+      ? (import.meta as any).env.VITE_API_URL.replace(/\/api\/v1\/?$/, '')
+      : 'http://localhost:8000';
 
-      const overlay = L.imageOverlay(fullUrl, rasterData.leaflet_bounds, {
+    const renderOverlay = (raster: RasterResponse, domainLabel: string) => {
+      if (!raster.raster_url || !raster.leaflet_bounds) return;
+
+      const fullUrl = raster.raster_url.startsWith('http')
+        ? raster.raster_url
+        : `${apiServer}${raster.raster_url}`;
+
+      const overlay = L.imageOverlay(fullUrl, raster.leaflet_bounds, {
         opacity: rasterOpacity,
         interactive: true,
-        alt: `${rasterData.dataset_id} ${rasterData.variable} Mean Raster`,
+        className: 'scientific-raster-overlay',
+        alt: `${domainLabel} ${raster.dataset_id} ${raster.variable} ${activeMode}`,
       });
 
+      const meanVal = raster.statistics?.domain_mean;
+      const statsText =
+        activeMode === 'trend'
+          ? `Theil-Sen Trend: <strong>${meanVal !== undefined && meanVal >= 0 ? '+' : ''}${meanVal ?? 'N/A'} ${raster.unit}</strong>`
+          : `Period Mean: <strong>${meanVal ?? 'N/A'} ${raster.unit}</strong>`;
+
       overlay.bindTooltip(
-        `<div style="font-family: var(--font-sans); font-size: 11px;">
-          <strong>${rasterData.long_name || rasterData.variable}</strong><br/>
-          Provenance: ${rasterData.provenance_type}<br/>
-          Mean: ${rasterData.statistics?.domain_mean.toFixed(2)} ${rasterData.unit || 'kg/m²'}
+        `<div style="font-family: var(--font-sans); font-size: 11px; line-height: 1.4;">
+          <div style="font-weight: 700; color: #173F35; margin-bottom: 2px;">${domainLabel} · ${raster.long_name || raster.variable}</div>
+          <div>${statsText}</div>
+          <div style="font-size: 9px; color: #64748B; margin-top: 2px;">Source: ${raster.source_attribution || raster.provenance_type}</div>
         </div>`,
         { sticky: true }
       );
 
       scientificGroup.addLayer(overlay);
+    };
+
+    if (dualRasterData.domain_a) {
+      renderOverlay(dualRasterData.domain_a, `Domain A (${regionAName})`);
     }
-  }, [rasterData, showScientificRaster, rasterOpacity]);
+    if (dualRasterData.domain_b) {
+      renderOverlay(dualRasterData.domain_b, `Domain B (${regionBName})`);
+    }
+  }, [dualRasterData, showScientificRaster, rasterOpacity, activeMode, regionAName, regionBName]);
 
-  // 4. Preset Camera Auto-Framing (Fires ONLY when selectedPresetId changes)
+  // 6. Camera Auto-Framing on Preset or Landmark Selection
+  const bboxKey = `${bboxA.join(',')}_${bboxB.join(',')}_${selectedPresetId}`;
+  const prevBboxKeyRef = useRef<string>('');
+
   useEffect(() => {
-    if (!selectedPresetId) return;
-    if (prevPresetIdRef.current === selectedPresetId) return;
+    if (prevBboxKeyRef.current === bboxKey) return;
+    prevBboxKeyRef.current = bboxKey;
 
-    prevPresetIdRef.current = selectedPresetId;
     const map = mapInstanceRef.current;
     if (!map) return;
 
@@ -359,7 +450,7 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
     } else if (resA.isValid && resA.leafletBounds) {
       map.flyToBounds(resA.leafletBounds, { padding: [60, 60], maxZoom: 6, duration: 0.8 });
     }
-  }, [selectedPresetId, bboxA, bboxB]);
+  }, [bboxKey, bboxA, bboxB, selectedPresetId]);
 
   // Camera Actions
   const handleFitBoth = useCallback(() => {
@@ -396,7 +487,7 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
   const handleWorldView = useCallback(() => {
     const map = mapInstanceRef.current;
     if (!map) return;
-    map.flyTo([20, 0], 2, { duration: 0.7 });
+    map.flyTo([25, 10], 2, { duration: 0.7 });
   }, []);
 
   const handleToggleFullscreen = useCallback(() => {
@@ -408,17 +499,17 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
     }
   }, []);
 
-  const handleZoomIn = useCallback(() => {
-    mapInstanceRef.current?.zoomIn();
-  }, []);
-
-  const handleZoomOut = useCallback(() => {
-    mapInstanceRef.current?.zoomOut();
-  }, []);
-
-  const handleToggleBasemap = useCallback(() => {
-    setBasemapMode((prev) => (prev === 'geography' ? 'satellite' : 'geography'));
-  }, []);
+  // Compute CSS gradient string from backend shared_scale color stops
+  const legendGradientStyle = useMemo(() => {
+    if (!dualRasterData?.shared_scale?.color_stops?.length) {
+      return 'linear-gradient(to right, #053061, #6bacd1, #f7f6f6, #e48066, #67001f)';
+    }
+    const stops = dualRasterData.shared_scale.color_stops;
+    const gradientStops = stops
+      .map((s) => `${s.hex} ${Math.round(s.stop * 100)}%`)
+      .join(', ');
+    return `linear-gradient(to right, ${gradientStops})`;
+  }, [dualRasterData]);
 
   return (
     <div
@@ -435,11 +526,11 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
         position: 'relative',
       }}
     >
-      {/* Top GIS Toolbar (Always Pinned) */}
+      {/* ── Top GIS Toolbar (Pinned) ───────────────────────────────── */}
       <div
         style={{
-          height: 42,
-          padding: '0 14px',
+          minHeight: 44,
+          padding: '6px 14px',
           background: 'rgba(255, 255, 255, 0.98)',
           borderBottom: '1px solid var(--color-border)',
           display: 'flex',
@@ -448,11 +539,11 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
           gap: 12,
           flexShrink: 0,
           zIndex: 10,
+          flexWrap: 'wrap',
         }}
       >
         {/* Left: Domain Indicator Legend */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          {/* Domain A pill */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <span
               style={{
@@ -475,7 +566,6 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
             </span>
           </div>
 
-          {/* Domain B pill */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <span
               style={{
@@ -499,8 +589,9 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
           </div>
         </div>
 
-        {/* Center: Basemap Mode Switcher */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        {/* Center: Variable & Mode Controls */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          {/* Variable Selector */}
           <div
             style={{
               display: 'inline-flex',
@@ -511,13 +602,13 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
             }}
           >
             <button
-              onClick={() => setBasemapMode('geography')}
+              onClick={() => handleVariableChange('T2M')}
               style={{
                 fontFamily: 'var(--font-sans)',
                 fontSize: 10,
-                fontWeight: basemapMode === 'geography' ? 600 : 500,
-                color: basemapMode === 'geography' ? '#ffffff' : 'var(--color-graphite)',
-                background: basemapMode === 'geography' ? 'var(--color-forest)' : 'transparent',
+                fontWeight: activeVariable === 'T2M' ? 700 : 500,
+                color: activeVariable === 'T2M' ? '#ffffff' : 'var(--color-graphite)',
+                background: activeVariable === 'T2M' ? 'var(--color-forest)' : 'transparent',
                 border: 'none',
                 borderRadius: 3,
                 padding: '3px 8px',
@@ -525,16 +616,16 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
                 transition: 'all 120ms ease',
               }}
             >
-              Geography
+              T2M Temp
             </button>
             <button
-              onClick={() => setBasemapMode('satellite')}
+              onClick={() => handleVariableChange('PRECTOTCORR')}
               style={{
                 fontFamily: 'var(--font-sans)',
                 fontSize: 10,
-                fontWeight: basemapMode === 'satellite' ? 600 : 500,
-                color: basemapMode === 'satellite' ? '#ffffff' : 'var(--color-graphite)',
-                background: basemapMode === 'satellite' ? 'var(--color-forest)' : 'transparent',
+                fontWeight: activeVariable === 'PRECTOTCORR' ? 700 : 500,
+                color: activeVariable === 'PRECTOTCORR' ? '#ffffff' : 'var(--color-graphite)',
+                background: activeVariable === 'PRECTOTCORR' ? 'var(--color-forest)' : 'transparent',
                 border: 'none',
                 borderRadius: 3,
                 padding: '3px 8px',
@@ -542,38 +633,76 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
                 transition: 'all 120ms ease',
               }}
             >
-              Satellite
+              Rainfall
+            </button>
+            <button
+              onClick={() => handleVariableChange('RootMoist_inst')}
+              title="NASA GLDAS Noah 2.1 Soil Moisture"
+              style={{
+                fontFamily: 'var(--font-sans)',
+                fontSize: 10,
+                fontWeight: activeVariable === 'RootMoist_inst' ? 700 : 500,
+                color: activeVariable === 'RootMoist_inst' ? '#ffffff' : 'var(--color-graphite)',
+                background: activeVariable === 'RootMoist_inst' ? 'var(--color-forest)' : 'transparent',
+                border: 'none',
+                borderRadius: 3,
+                padding: '3px 8px',
+                cursor: 'pointer',
+                transition: 'all 120ms ease',
+              }}
+            >
+              GLDAS Soil
             </button>
           </div>
 
-          {basemapMode === 'satellite' && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-              <span style={{ fontSize: 9, fontFamily: 'var(--font-mono)', color: 'var(--color-slate-text)' }}>
-                {Math.round(satelliteOpacity * 100)}%
-              </span>
-              <input
-                type="range"
-                min={0}
-                max={1}
-                step={0.05}
-                value={satelliteOpacity}
-                onChange={(e) => setSatelliteOpacity(parseFloat(e.target.value))}
-                style={{ width: 50, cursor: 'pointer', accentColor: 'var(--color-forest)' }}
-              />
-            </div>
-          )}
-
-          {/* Layer 03: Scientific GLDAS Raster Toggle */}
+          {/* Mode Selector */}
           <div
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              borderLeft: '1px solid var(--color-border)',
-              paddingLeft: 8,
-              marginLeft: 4,
+              display: 'inline-flex',
+              background: 'var(--color-muted)',
+              padding: 2,
+              borderRadius: 'var(--radius-sm)',
+              border: '1px solid var(--color-border)',
             }}
           >
+            <button
+              onClick={() => setActiveMode('mean')}
+              style={{
+                fontFamily: 'var(--font-sans)',
+                fontSize: 10,
+                fontWeight: activeMode === 'mean' ? 700 : 500,
+                color: activeMode === 'mean' ? '#ffffff' : 'var(--color-graphite)',
+                background: activeMode === 'mean' ? 'var(--color-forest)' : 'transparent',
+                border: 'none',
+                borderRadius: 3,
+                padding: '3px 8px',
+                cursor: 'pointer',
+                transition: 'all 120ms ease',
+              }}
+            >
+              Period Mean
+            </button>
+            <button
+              onClick={() => setActiveMode('trend')}
+              style={{
+                fontFamily: 'var(--font-sans)',
+                fontSize: 10,
+                fontWeight: activeMode === 'trend' ? 700 : 500,
+                color: activeMode === 'trend' ? '#ffffff' : 'var(--color-graphite)',
+                background: activeMode === 'trend' ? 'var(--color-forest)' : 'transparent',
+                border: 'none',
+                borderRadius: 3,
+                padding: '3px 8px',
+                cursor: 'pointer',
+                transition: 'all 120ms ease',
+              }}
+            >
+              Trend (Theil-Sen)
+            </button>
+          </div>
+
+          {/* Overlay Toggle & Opacity */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, borderLeft: '1px solid var(--color-border)', paddingLeft: 8 }}>
             <label
               style={{
                 display: 'flex',
@@ -592,10 +721,10 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
                 onChange={(e) => setShowScientificRaster(e.target.checked)}
                 style={{ accentColor: 'var(--color-forest)', cursor: 'pointer' }}
               />
-              GLDAS Raster
+              Scientific Overlay
             </label>
 
-            {showScientificRaster && rasterData?.status === 'SUCCESS' && (
+            {showScientificRaster && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                 <span style={{ fontSize: 9, fontFamily: 'var(--font-mono)', color: 'var(--color-slate-text)' }}>
                   {Math.round(rasterOpacity * 100)}%
@@ -603,7 +732,7 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
                 <input
                   type="range"
                   min={0.2}
-                  max={1}
+                  max={1.0}
                   step={0.05}
                   value={rasterOpacity}
                   onChange={(e) => setRasterOpacity(parseFloat(e.target.value))}
@@ -611,48 +740,48 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
                 />
               </div>
             )}
-
-            {rasterData?.provenance_type === 'NASA_GLDAS_NETCDF' ? (
-              <span
-                style={{
-                  fontSize: 9,
-                  fontFamily: 'var(--font-mono)',
-                  background: 'rgba(23, 63, 53, 0.1)',
-                  color: 'var(--color-forest)',
-                  padding: '2px 5px',
-                  borderRadius: 3,
-                  fontWeight: 600,
-                }}
-              >
-                NASA NetCDF
-              </span>
-            ) : rasterData?.status === 'DATA_UNAVAILABLE' ? (
-              <span
-                style={{
-                  fontSize: 9,
-                  fontFamily: 'var(--font-mono)',
-                  background: 'rgba(185, 111, 80, 0.12)',
-                  color: '#B96F50',
-                  padding: '2px 5px',
-                  borderRadius: 3,
-                  fontWeight: 600,
-                }}
-              >
-                NetCDF Required
-              </span>
-            ) : null}
           </div>
         </div>
 
         {/* Right: Camera Action Controls */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+          {isRasterLoading && (
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                fontSize: 10,
+                fontFamily: 'var(--font-mono)',
+                color: 'var(--color-forest)',
+                background: 'rgba(23, 63, 53, 0.08)',
+                padding: '3px 8px',
+                borderRadius: 'var(--radius-sm)',
+                fontWeight: 600,
+              }}
+            >
+              <div
+                style={{
+                  width: 9,
+                  height: 9,
+                  borderRadius: '50%',
+                  border: '2px solid rgba(23, 63, 53, 0.3)',
+                  borderTopColor: 'var(--color-forest)',
+                  animation: 'spin 0.8s linear infinite',
+                }}
+              />
+              {loadingElapsedSec >= 4
+                ? `Calculating spatial trends (${loadingElapsedSec}s)...`
+                : 'Updating scientific layer...'}
+            </div>
+          )}
           <button
             onClick={handleFitBoth}
             disabled={!validationA.isValid && !validationB.isValid}
             className="btn-secondary"
             style={{ fontSize: 10, padding: '3px 8px', fontWeight: 600 }}
           >
-            Fit both
+            Fit Both
           </button>
           <button
             onClick={handleFocusDomainA}
@@ -680,7 +809,7 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
         </div>
       </div>
 
-      {/* Main Map Viewport (Fills exact remaining height) */}
+      {/* ── Main Map Viewport ───────────────────────────────────────── */}
       <div style={{ flex: 1, minHeight: 0, position: 'relative', width: '100%' }}>
         <div
           ref={containerRef}
@@ -694,7 +823,7 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
           }}
         />
 
-        {/* Floating Right-Hand GIS Control Dock (NASA / Scientific GIS Standard) */}
+        {/* Floating Right-Hand GIS Control Dock */}
         <div
           style={{
             position: 'absolute',
@@ -725,10 +854,7 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
               borderBottom: '1px solid var(--color-border)',
               cursor: 'pointer',
               color: 'var(--color-graphite)',
-              transition: 'background 120ms ease',
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--color-muted)')}
-            onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
             aria-label="Toggle Fullscreen"
           >
             {isFullscreen ? (
@@ -742,62 +868,9 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
             )}
           </button>
 
-          {/* Zoom In Button */}
-          <button
-            onClick={handleZoomIn}
-            title="Zoom In"
-            style={{
-              width: 32,
-              height: 32,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: 'transparent',
-              border: 'none',
-              borderBottom: '1px solid var(--color-border)',
-              cursor: 'pointer',
-              color: 'var(--color-graphite)',
-              transition: 'background 120ms ease',
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--color-muted)')}
-            onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-            aria-label="Zoom in"
-          >
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="12" y1="5" x2="12" y2="19"/>
-              <line x1="5" y1="12" x2="19" y2="12"/>
-            </svg>
-          </button>
-
-          {/* Zoom Out Button */}
-          <button
-            onClick={handleZoomOut}
-            title="Zoom Out"
-            style={{
-              width: 32,
-              height: 32,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: 'transparent',
-              border: 'none',
-              borderBottom: '1px solid var(--color-border)',
-              cursor: 'pointer',
-              color: 'var(--color-graphite)',
-              transition: 'background 120ms ease',
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--color-muted)')}
-            onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-            aria-label="Zoom out"
-          >
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="5" y1="12" x2="19" y2="12"/>
-            </svg>
-          </button>
-
           {/* Basemap Switcher */}
           <button
-            onClick={handleToggleBasemap}
+            onClick={() => setBasemapMode((prev) => (prev === 'geography' ? 'satellite' : 'geography'))}
             title={`Basemap: ${basemapMode === 'geography' ? 'Light Geography' : 'Satellite Imagery'}. Click to toggle.`}
             style={{
               width: 32,
@@ -807,16 +880,8 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
               justifyContent: 'center',
               background: basemapMode === 'satellite' ? 'var(--color-forest)' : 'transparent',
               border: 'none',
-              borderBottom: '1px solid var(--color-border)',
               cursor: 'pointer',
               color: basemapMode === 'satellite' ? '#ffffff' : 'var(--color-graphite)',
-              transition: 'background 120ms ease',
-            }}
-            onMouseEnter={(e) => {
-              if (basemapMode !== 'satellite') e.currentTarget.style.background = 'var(--color-muted)';
-            }}
-            onMouseLeave={(e) => {
-              if (basemapMode !== 'satellite') e.currentTarget.style.background = 'transparent';
             }}
             aria-label="Toggle basemap"
           >
@@ -826,69 +891,62 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
               <polyline points="2 12 12 17 22 12"/>
             </svg>
           </button>
-
-          {/* Reset / Global View Button */}
-          <button
-            onClick={handleWorldView}
-            title="Reset to Global World View"
-            style={{
-              width: 32,
-              height: 32,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              color: 'var(--color-graphite)',
-              transition: 'background 120ms ease',
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--color-muted)')}
-            onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-            aria-label="Global world view"
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10"/>
-              <line x1="2" y1="12" x2="22" y2="12"/>
-              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-            </svg>
-          </button>
         </div>
 
-        {/* Floating Scientific Colorbar Legend */}
-        {showScientificRaster && rasterData && rasterData.status === 'SUCCESS' && rasterData.statistics && (
+        {/* ── Dynamic Scientific Colorbar Legend (Floating HUD) ──────── */}
+        {showScientificRaster && dualRasterData && dualRasterData.status === 'SUCCESS' && (
           <div
             style={{
               position: 'absolute',
               bottom: 14,
               right: 14,
               zIndex: 1000,
-              background: 'rgba(255, 255, 255, 0.95)',
-              padding: '8px 12px',
+              background: 'rgba(255, 255, 255, 0.96)',
+              padding: '10px 14px',
               borderRadius: 'var(--radius-md)',
               border: '1px solid var(--color-border)',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+              boxShadow: '0 2px 10px rgba(0, 0, 0, 0.10)',
               fontFamily: 'var(--font-sans)',
-              minWidth: 190,
+              minWidth: 260,
+              maxWidth: 320,
             }}
           >
-            <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--color-graphite)', marginBottom: 2 }}>
-              {rasterData.long_name || rasterData.variable}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 2 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-graphite)' }}>
+                {dualRasterData.domain_a?.long_name || activeVariable}
+              </div>
+              <span
+                style={{
+                  fontSize: 8,
+                  fontFamily: 'var(--font-mono)',
+                  color: 'var(--color-forest)',
+                  background: 'rgba(23, 63, 53, 0.08)',
+                  padding: '1px 5px',
+                  borderRadius: 2,
+                  fontWeight: 600,
+                }}
+              >
+                SHARED SCALE
+              </span>
             </div>
+
             <div style={{ fontSize: 9, color: 'var(--color-slate-text)', marginBottom: 6 }}>
-              Temporal Mean ({rasterData.unit || 'kg/m²'})
+              {activeMode === 'mean' ? '25-Year Period Mean' : 'Long-term Trend (Theil-Sen Robust Slope)'} ({dualRasterData.domain_a?.unit})
             </div>
-            {/* Colorbar gradient (YlGnBu) */}
+
+            {/* Dynamic Continuous CSS Gradient Bar */}
             <div
               style={{
-                height: 10,
+                height: 12,
                 width: '100%',
                 borderRadius: 2,
-                background: 'linear-gradient(to right, #ffffd9, #edf8b1, #c7e9b4, #7fcdbb, #41b6c4, #1d91c0, #225ea8, #081d58)',
+                background: legendGradientStyle,
                 marginBottom: 4,
                 border: '1px solid rgba(0, 0, 0, 0.15)',
               }}
             />
+
+            {/* Scale Value Labels */}
             <div
               style={{
                 display: 'flex',
@@ -896,31 +954,140 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
                 fontFamily: 'var(--font-mono)',
                 fontSize: 9,
                 color: 'var(--color-graphite)',
+                marginBottom: 6,
               }}
             >
-              <span>{rasterData.statistics.min_value.toFixed(1)}</span>
-              <span style={{ color: 'var(--color-slate-text)' }}>
-                mean: {rasterData.statistics.domain_mean.toFixed(1)}
-              </span>
-              <span>{rasterData.statistics.max_value.toFixed(1)}</span>
+              <span>{dualRasterData.shared_scale.vmin}</span>
+              {dualRasterData.shared_scale.scale_type === 'diverging' && (
+                <span style={{ color: 'var(--color-slate-text)', fontWeight: 600 }}>
+                  0.0 (Neutral)
+                </span>
+              )}
+              <span>{dualRasterData.shared_scale.vmax}</span>
             </div>
+
+            {/* Comparative Domain Summary */}
             <div
               style={{
-                marginTop: 4,
-                fontSize: 8,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 2,
+                padding: '4px 6px',
+                background: 'var(--color-muted)',
+                borderRadius: 3,
+                fontSize: 9,
                 fontFamily: 'var(--font-mono)',
-                color: 'var(--color-forest)',
-                fontWeight: 600,
-                letterSpacing: '0.03em',
+                marginBottom: 6,
               }}
             >
-              PROVENANCE: NASA GLDAS NetCDF
+              <div style={{ display: 'flex', justifyContent: 'space-between', color: '#B96F50' }}>
+                <span>Domain A ({regionAName}):</span>
+                <strong>
+                  {activeMode === 'trend' && (dualRasterData.domain_a?.statistics?.domain_mean ?? 0) >= 0 ? '+' : ''}
+                  {dualRasterData.domain_a?.statistics?.domain_mean ?? 'N/A'} {dualRasterData.domain_a?.unit}
+                </strong>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', color: '#537D8C' }}>
+                <span>Domain B ({regionBName}):</span>
+                <strong>
+                  {activeMode === 'trend' && (dualRasterData.domain_b?.statistics?.domain_mean ?? 0) >= 0 ? '+' : ''}
+                  {dualRasterData.domain_b?.statistics?.domain_mean ?? 'N/A'} {dualRasterData.domain_b?.unit}
+                </strong>
+              </div>
+            </div>
+
+            {/* Scientific Provenance Note */}
+            <div
+              style={{
+                fontSize: 8,
+                fontFamily: 'var(--font-mono)',
+                color: 'var(--color-slate-text)',
+                lineHeight: 1.3,
+              }}
+            >
+              NASA POWER (MERRA-2) · 0.5° × 0.625° native · 4× display smoothing
+            </div>
+          </div>
+        )}
+
+        {/* Scientific Notice / Alert Banner positioned at Top-Left */}
+        {rasterError && (
+          <div
+            style={{
+              position: 'absolute',
+              top: 14,
+              left: 14,
+              maxWidth: 420,
+              zIndex: 1000,
+              background: 'rgba(255, 255, 255, 0.98)',
+              backdropFilter: 'blur(4px)',
+              padding: '10px 12px',
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid #B96F50',
+              boxShadow: '0 4px 14px rgba(0, 0, 0, 0.12)',
+              fontFamily: 'var(--font-sans)',
+              fontSize: 10,
+              color: 'var(--color-graphite)',
+              lineHeight: 1.4,
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 7 }}>
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#B96F50"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{ flexShrink: 0, marginTop: 1 }}
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+                <div>
+                  <div style={{ fontWeight: 700, color: '#B96F50', marginBottom: 2 }}>
+                    Scientific Notice
+                  </div>
+                  <div style={{ color: 'var(--color-graphite)' }}>
+                    {rasterError}
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={() => setRasterError(null)}
+                title="Dismiss Notice"
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: 'var(--color-slate-text)',
+                  fontSize: 15,
+                  lineHeight: 1,
+                  padding: '0 2px',
+                }}
+                aria-label="Dismiss notice"
+              >
+                &times;
+              </button>
+            </div>
+            <div style={{ marginTop: 8, display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
+              <button
+                onClick={() => loadScientificRasters()}
+                className="btn-secondary"
+                style={{ fontSize: 9, padding: '2px 8px', borderColor: '#B96F50', color: '#B96F50' }}
+              >
+                Retry Stream
+              </button>
             </div>
           </div>
         )}
       </div>
 
-      {/* Bottom Status Bar (Always Pinned) */}
+      {/* ── Bottom Status Bar (Pinned) ─────────────────────────────── */}
       <div
         style={{
           height: 32,
@@ -938,7 +1105,6 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
           color: 'var(--color-slate-text)',
         }}
       >
-        {/* Live Cursor Coordinates */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <span style={{ color: 'var(--color-moss)', fontWeight: 600 }}>Cursor:</span>
           <span>
@@ -952,7 +1118,6 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
           <span>Zoom: {currentZoom}</span>
         </div>
 
-        {/* Domain Coordinate Readout */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <span style={{ color: '#B96F50' }}>
             Domain A: [{bboxA[0]}°, {bboxA[1]}°, {bboxA[2]}°, {bboxA[3]}°]
@@ -962,11 +1127,8 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
           </span>
         </div>
 
-        {/* Map Attribution */}
         <div style={{ fontSize: 9, opacity: 0.7 }}>
-          {import.meta.env.VITE_CARTO_API_KEY
-            ? 'CARTO Positron / OpenStreetMap'
-            : 'Esri World Light Gray / OpenStreetMap'}
+          Esri World Light Gray / NASA POWER Reanalysis
         </div>
       </div>
 

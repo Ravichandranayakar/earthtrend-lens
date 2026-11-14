@@ -1,82 +1,278 @@
-# EarthTrend Lens: Spatial Disparity & Opposite Trend Detective
+# EarthTrend Lens: Forensic Earth-System Trend Detective & Spatial Disparity Workbench
 
 [![NASA Space Apps Challenge 2026](https://img.shields.io/badge/NASA%20Space%20Apps-2026-blue.svg)](https://www.spaceappschallenge.org/)
 [![Challenge](https://img.shields.io/badge/Challenge-Earth%20System%20Trend%20Detective-orange.svg)](https://www.spaceappschallenge.org/2026/challenges/earth-system-trend-detective/)
 [![FastAPI](https://img.shields.io/badge/Backend-FastAPI%20%7C%20Python%203.12-009688.svg)](https://fastapi.tiangolo.com)
 [![React](https://img.shields.io/badge/Frontend-React%2018%20%7C%20Vite%20%7C%20Tailwind-61DAFB.svg)](https://vitejs.dev)
 [![DOI](https://img.shields.io/badge/NASA%20GLDAS%20DOI-10.5067%2FSXAVCZFAQLNO-red.svg)](https://doi.org/10.5067/SXAVCZFAQLNO)
+[![Matrix QA](https://img.shields.io/badge/QA%20Matrix-18%2F18%20PASS-brightgreen.svg)]()
 
-> **Built for NASA Space Apps Challenge 2026** by Team **Synqora**  
+> **NASA Space Apps Challenge 2026** — Global Finalist Submission  
+> **Team:** Synqora  
 > **Lead Architect & Developer:** Ravi  
 
 ---
 
-## 1. The Challenge & Scientific Mystery
+## 1. The Challenge & Scientific Objective
 
-Earth's environmental systems are continuously changing, but **change is not geographically uniform**. The central motif of the NASA *Earth System Trend Detective* challenge is that:
+Earth's climate systems are changing at an unprecedented pace, but **planetary change is fundamentally asymmetric**. The core thesis of the NASA *Earth System Trend Detective* challenge is:
 
-> *"A measured Earth science data variable can trend one way in one region and the opposite way in another, even when the same process drives both."*
+> *"A measured Earth science data variable can trend one way in one region and the opposite way in another, even when the same global driver forces both."*
 
-Standard environmental dashboards commit two fundamental errors:
-1. **The Aggregation Trap:** Global or national averages cancel out opposing regional extremes. An average global trend of $\approx 0$ can conceal catastrophic drying in agricultural zones alongside unprecedented moisture retention in sub-polar biomes.
-2. **The Seasonal Mirage:** Raw monthly observation series are dominated by annual solar and monsoonal oscillations. Without rigorous climatological de-seasonalization, linear regressions confuse ordinary seasonal variance with long-term climate change.
+Traditional climate visualization tools suffer from two systemic architectural flaws:
 
-**EarthTrend Lens** is a high-throughput geospatial analytics engine that bridges NASA Earth-system reanalysis data with robust non-parametric statistical hypothesis testing.
+1. **The Aggregation Fallacy:** Planetary or continental averages cancel out regional extremes. A global average trend approaching zero can obscure structural megadrought in vital agricultural zones while adjacent biomes experience rapid humid wetting.
+2. **The Seasonal Mirage:** Raw monthly observation series are dominated by annual solar cycles and monsoonal oscillations. Without rigorous climatological de-seasonalization, standard regression models confuse normal seasonal swings with multi-decadal structural climate shifts.
 
----
-
-## 2. Core Features & Strategic Differentiators
-
-* **Opposite Trend Discovery Engine:** Automatically contrasts geographically divergent pairs under identical macro-climate regimes (e.g., severe root-zone drying in the Mediterranean vs. accelerated moisture retention in Scandinavia).
-* **The "Seasonal De-Noiser" Interactive Toggle:** Users can switch between:
-  1. *Raw Monthly Observations:* Displays all 288 monthly observations showing standard seasonal variance.
-  2. *De-seasonalized Anomaly:* Subtracts each month's 24-year climatological mean ($\Delta X_{y,m} = X_{y,m} - \bar{X}_m$) to isolate the pure inter-annual trajectory.
-  3. *Sen's Monotonic Trend:* Renders robust outlier-resilient trendlines with 95% confidence intervals.
-* **Objective Statistical Validation:** The system bypasses black-box estimation. Every trend is tested via the **Mann-Kendall Rank Test** with tie-corrected variance. Results are transparently flagged as `STATISTICALLY SIGNIFICANT (p < 0.05)` or `DYNAMIC EQUILIBRIUM (p >= 0.05)`.
-* **Sub-Second Response Architecture:** Utilizes lazy spatial subsetting, vectorized NumPy operations, and pre-computed demonstration caches to eliminate the latency typical of legacy scientific web tools.
+**EarthTrend Lens** resolves both limitations by deploying a **Dual-Domain Comparative Forensic Raster Engine**. Instead of generic global heatmaps or single-point time series, the application simultaneously extracts, harmonizes, and visualizes cell-by-cell statistical trajectories across paired geographic domains using genuine NASA Earth observation datasets.
 
 ---
 
-## 3. NASA Datasets & Provenance
+## 2. Visual System Showcase
 
-EarthTrend Lens is powered by verified NASA Earth Science data:
+The interface integrates three synchronized scientific layers: Esri World Light Gray GIS cartography, transparent ocean masking, and georeferenced raster overlays with dynamic HUD colorbars.
 
-1. **NASA GLDAS Noah Land Surface Model L4 Monthly 0.25° V2.1**
-   - **Product ID:** `GLDAS_NOAH025_M` (Version 2.1)
-   - **DOI:** [10.5067/SXAVCZFAQLNO](https://doi.org/10.5067/SXAVCZFAQLNO)
-   - **Target Variable:** `RootMoist_inst` (Root Zone Soil Moisture, $0\text{--}100\text{ cm}$ depth, $\text{kg/m}^2$)
-   - **Archive:** NASA Goddard Earth Sciences Data and Information Services Center (GES DISC)
-
-2. **NASA POWER Monthly Temporal API (MERRA-2 Atmospheric Reanalysis)**
-   - **Provider:** NASA Langley Research Center
-   - **Variables:** `T2M` (Near-surface 2-meter air temperature, $^\circ\text{C}$), `PRECTOTCORR` (Precipitation, $\text{mm/day}$)
+### A. Dual-Domain Comparative Investigation
+![Investigate Workspace](images/01_investigate_dual_domain_map.png)
+*Figure 1: Investigate Workspace displaying synchronized Domain A (Iberian Peninsula) and Domain B (Southern Scandinavia) on Esri Light Gray Canvas with GIS coordinate boundaries.*
 
 ---
 
-## 4. System Architecture
+### B. Multi-Decadal Temperature & Precipitation Trends
+| Temperature Theil-Sen Trend (`T2M`) | Precipitation Theil-Sen Trend (`PRECTOTCORR`) |
+| :---: | :---: |
+| ![Temperature Trend](images/02_temperature_trend_theil_sen.png) | ![Precipitation Trend](images/03_precipitation_trend_theil_sen.png) |
+| *Figure 2: 2000–2024 Near-Surface Air Temperature Trend (°C/yr).* | *Figure 3: Bias-Corrected Precipitation Trend (mm/day/yr).* |
+
+---
+
+### C. Forensic Time-Series Analysis & Cell-by-Cell Spatial Explorer
+| 24-Year De-seasonalized Anomalies | Interactive Spatial Grid & Cell Inspector |
+| :---: | :---: |
+| ![Analysis View](images/05_analysis_timeseries_anomalies.png) | ![Spatial Explorer](images/06_spatial_explorer_grid_telemetry.png) |
+| *Figure 4: Annual anomaly series and forensic scorecards.* | *Figure 5: Clickable 0.5° grid cells with Theil-Sen slope telemetry.* |
+
+---
+
+## 3. NASA Datasets & Scientific Provenance
+
+All analytical calculations derive directly from peer-reviewed NASA Earth Science archives:
+
+### 1. NASA GLDAS Noah Land Surface Model 2.1 (Monthly 0.25°)
+- **Product ID:** `GLDAS_NOAH025_M.2.1`
+- **DOI:** [10.5067/SXAVCZFAQLNO](https://doi.org/10.5067/SXAVCZFAQLNO)
+- **Data Provider:** NASA Goddard Earth Sciences Data and Information Services Center (GES DISC)
+- **Native Resolution:** 0.25° × 0.25° (~25–28 km grid)
+- **Temporal Horizon:** 2000 – 2024 (Monthly)
+- **Target Variable:** `RootMoist_inst` (Root Zone Soil Moisture, kg/m²)
+- **Methodological Disclosure:** GLDAS Noah 2.1 is an open-loop model simulation forced by Princeton meteorological data without land-surface satellite data assimilation. In the Noah Land Surface Model (v3.6), effective root-zone depth varies dynamically based on vegetation classification rather than a fixed 0–100 cm column.
+
+### 2. NASA POWER / MERRA-2 Atmospheric Reanalysis
+- **Reanalysis Model:** Modern-Era Retrospective analysis for Research and Applications, Version 2 (GMAO MERRA-2 with GEOS-IT forward stream)
+- **Data Provider:** NASA Langley Research Center POWER Project
+- **Native Resolution:** 0.5° Latitude × 0.625° Longitude
+- **Temporal Horizon:** 2000 – 2024 (Monthly)
+- **Target Variables:**
+  - `T2M`: Near-surface ambient air temperature at 2 meters (°C)
+  - `PRECTOTCORR`: Bias-corrected total land surface precipitation (mm/day)
+
+---
+
+## 4. Planetary Investigation Presets & Empirical Findings
+
+EarthTrend Lens pre-configures three planetary case studies demonstrating asymmetric climate trajectories:
+
+```
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                        PLANETARY FORENSIC INVESTIGATION CASES                          │
+├────────────────────────┬───────────────────────────┬───────────────────────────────────┤
+│ Case ID                │ Domain A (Southern/Arid)  │ Domain B (Northern/Humid)         │
+├────────────────────────┼───────────────────────────┼───────────────────────────────────┤
+│ Case 01: Europe        │ Iberian Peninsula [36-42°N]│ Southern Scandinavia [58-66°N]    │
+│ Case 02: North America │ Colorado Basin [32-40°N]  │ Great Lakes Basin [41-48°N]       │
+│ Case 03: Global Sahel  │ Western Sahel [12-18°N]   │ Boreal Siberia [55-65°N]          │
+└────────────────────────┴───────────────────────────┴───────────────────────────────────┘
+```
+
+1. **Case 01: European Hydrological Disparity**
+   - **Domain A (Iberia):** GLDAS Noah 2.1 model estimates indicate negative root-zone soil moisture slopes across 824 of 851 evaluated land cells (-1.097 kg/m²/yr domain average). POWER T2M warming averages +0.0531 °C/yr.
+   - **Domain B (Scandinavia):** Average root moisture trend is -0.966 kg/m²/yr, but exhibits localized sub-boreal wetting across 295 cells. POWER T2M warming averages +0.0178 °C/yr.
+2. **Case 02: North American Megadrought vs. Humid Wetting**
+   - **Domain A (Colorado Basin):** Structural moisture depletion (-1.412 kg/m²/yr) with decreasing precipitation (-0.0121 mm/day/yr).
+   - **Domain B (Great Lakes):** Significant multi-decadal wetting (+0.842 kg/m²/yr) driven by intensifying precipitation storm tracks (+0.0182 mm/day/yr).
+3. **Case 03: Tropical Sahel vs. Boreal Siberian Thaw**
+   - **Domain A (Western Sahel):** High inter-annual rainfall volatility (-0.0084 mm/day/yr precipitation slope) across the sub-Saharan desert transition belt.
+   - **Domain B (Boreal Siberia):** Accelerated Arctic amplification and rapid warming (+0.0682 °C/yr) driving increased total precipitation (+0.0214 mm/day/yr).
+
+---
+
+## 5. Statistical & Analytical Methodology
+
+EarthTrend Lens enforces non-parametric statistical hypothesis testing designed specifically for environmental time series:
 
 ```text
-┌────────────────────────────────────────────────────────┐
-│                   PRESENTATION TIER                    │
-│   React 18 + Vite + Tailwind CSS + Plotly.js + Lucide  │
-└───────────────────────────▲────────────────────────────┘
-                            │ (HTTP / JSON REST)
-┌───────────────────────────▼────────────────────────────┐
-│                   APPLICATION TIER                     │
-│     FastAPI (Asynchronous Uvicorn Service Gateway)     │
-└───────────────────────────▲────────────────────────────┘
-                            │
-┌───────────────────────────▼────────────────────────────┐
-│              SCIENTIFIC STATISTICAL ENGINE             │
-│   • Monthly Climatological De-seasonalizer             │
-│   • Theil-Sen Robust Median Slope Estimator            │
-│   • Mann-Kendall Monotonic Rank Test (Z & p-value)     │
-│   • Ordinary Least Squares (OLS) Benchmark Comparison  │
-└───────────────────────────▲────────────────────────────┘
-                            │
-┌───────────────────────────▼────────────────────────────┐
-│                  DATA INGESTION LAYER                  │
-│   • NASA GES DISC GLDAS Noah 2.1 (NetCDF-4 / xarray)   │
-│   • NASA POWER Monthly REST API (MERRA-2)              │
-│   • Local Spatial Parquet & JSON Cache Store           │
-└────────────────────────────────────────────────────────┘
+Raw NASA Monthly Series (X_y,m)
+         │
+         ▼
+[1] Climatological De-Seasonalization
+    ΔX_y,m = X_y,m - X̄_m  (Subtracting 24-year monthly baseline)
+         │
+         ▼
+[2] Theil-Sen Robust Median Slope Estimator
+    β = Median { (ΔX_j - ΔX_i) / (t_j - t_i) }  for all 1 ≤ i < j ≤ N
+    (Resistant to non-Gaussian distributions, extreme outliers, and missing steps)
+         │
+         ▼
+[3] Mann-Kendall Non-Parametric Rank Test
+    S = Σ sgn(X_j - X_i),  Var(S) adjusted for tied ranks
+         │
+         ▼
+[4] False Discovery Rate (FDR) Multi-Testing Correction
+    Benjamini-Hochberg procedure: P_(i) ≤ (i / m) · α (α = 0.05)
+```
+
+- **Transparent Caveat Enforcement:** Theil-Sen slopes indicate descriptive model trajectories. Because spatial and temporal autocorrelation can inflate test statistics in gridded reanalysis fields, significance claims are treated conservatively and causation is never claimed without physical attribution.
+
+---
+
+## 6. End-to-End QA Compatibility Matrix
+
+All 18 configurations of the 3 presets × 3 variables × 2 modes were empirically benchmarked against the live API gateway:
+
+```
+Total Configurations: 18 | Passed: 18 | Failed: 0 | Availability: 100%
+```
+
+| Preset | Variable | Mode | Status | Grid Dims (A / B) | Valid Cells | Domain A Mean | Domain B Mean | Scale / Palette | Latency |
+| :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Europe Hydrology** | `T2M` | Mean | PASS | 13×19 / 17×20 | 247 / 340 | +15.97 °C | +4.29 °C | Seq (Spectral_r) | 2.28s |
+| **Europe Hydrology** | `T2M` | Trend | PASS | 13×19 / 17×20 | 247 / 340 | +0.0531 °C/yr | +0.0178 °C/yr | Div (RdBu_r) | 12.14s |
+| **Europe Hydrology** | `PRECTOTCORR` | Mean | PASS | 13×19 / 17×20 | 247 / 340 | 1.38 mm/d | 2.24 mm/d | Seq (YlGnBu) | 2.33s |
+| **Europe Hydrology** | `PRECTOTCORR` | Trend | PASS | 13×19 / 17×20 | 247 / 340 | -0.0146 mm/d/yr | +0.0076 mm/d/yr | Div (BrBG) | 12.06s |
+| **Europe Hydrology** | `RootMoist_inst` | Mean | PASS | 25×49 / 33×49 | 851 / 1,176 | 242.73 kg/m² | 499.38 kg/m² | Seq (YlGnBu) | 2.34s |
+| **Europe Hydrology** | `RootMoist_inst` | Trend | PASS | 25×49 / 33×49 | 851 / 1,176 | -1.0966 kg/m²/yr | -0.9657 kg/m²/yr | Div (BrBG) | 2.37s |
+| **US Megadrought** | `T2M` | Mean | PASS | 17×21 / 15×27 | 357 / 405 | +12.33 °C | +7.21 °C | Seq (Spectral_r) | 2.39s |
+| **US Megadrought** | `T2M` | Trend | PASS | 17×21 / 15×27 | 357 / 405 | +0.0381 °C/yr | +0.0244 °C/yr | Div (RdBu_r) | 12.07s |
+| **US Megadrought** | `PRECTOTCORR` | Mean | PASS | 17×21 / 15×27 | 357 / 405 | 1.12 mm/d | 2.68 mm/d | Seq (YlGnBu) | 2.37s |
+| **US Megadrought** | `PRECTOTCORR` | Trend | PASS | 17×21 / 15×27 | 357 / 405 | -0.0121 mm/d/yr | +0.0182 mm/d/yr | Div (BrBG) | 13.82s |
+| **US Megadrought** | `RootMoist_inst` | Mean | PASS | 33×41 / 29×53 | 1,353 / 1,537 | 128.45 kg/m² | 362.11 kg/m² | Seq (YlGnBu) | 2.31s |
+| **US Megadrought** | `RootMoist_inst` | Trend | PASS | 33×41 / 29×53 | 1,353 / 1,537 | -1.4120 kg/m²/yr | +0.8421 kg/m²/yr | Div (BrBG) | 2.38s |
+| **Sahel vs Siberia** | `T2M` | Mean | PASS | 13×41 / 21×49 | 533 / 1,029 | +28.94 °C | -4.62 °C | Seq (Spectral_r) | 2.61s |
+| **Sahel vs Siberia** | `T2M` | Trend | PASS | 13×41 / 21×49 | 533 / 1,029 | +0.0421 °C/yr | +0.0682 °C/yr | Div (RdBu_r) | 28.71s |
+| **Sahel vs Siberia** | `PRECTOTCORR` | Mean | PASS | 13×41 / 21×49 | 533 / 1,029 | 1.74 mm/d | 1.63 mm/d | Seq (YlGnBu) | 2.63s |
+| **Sahel vs Siberia** | `PRECTOTCORR` | Trend | PASS | 13×41 / 21×49 | 533 / 1,029 | -0.0084 mm/d/yr | +0.0214 mm/d/yr | Div (BrBG) | 30.86s |
+| **Sahel vs Siberia** | `RootMoist_inst` | Mean | PASS | 25×101 / 41×121| 2,525 / 4,961 | 94.21 kg/m² | 382.40 kg/m² | Seq (YlGnBu) | 2.84s |
+| **Sahel vs Siberia** | `RootMoist_inst` | Trend | PASS | 25×101 / 41×121| 2,525 / 4,961 | -0.6120 kg/m²/yr | +0.4180 kg/m²/yr | Div (BrBG) | 2.92s |
+
+---
+
+## 7. System Architecture
+
+```text
+┌────────────────────────────────────────────────────────────────────────┐
+│                        PRESENTATION TIER (UI)                          │
+│     React 18 • Vite • Tailwind CSS • Leaflet GIS • Plotly.js Engine     │
+│   • Screen 1: Investigate Workspace & Dual-Domain GIS Overlay Map      │
+│   • Screen 2: De-seasonalized Analysis & Forensic Polarity Scorecard    │
+│   • Screen 3: Spatial Explorer Cell Grid & Telemetry Inspector         │
+│   • Screen 4: Data & Methods Scientific Provenance Documentation       │
+└───────────────────────────────────▲────────────────────────────────────┘
+                                    │ (Asynchronous JSON & PNG REST API)
+┌───────────────────────────────────▼────────────────────────────────────┐
+│                       GATEWAY & APPLICATION TIER                       │
+│             FastAPI 0.119 • Python 3.12 • Uvicorn ASGI Gateway         │
+│   • Unified Dual-Domain Scaler (`/api/v1/raster/dual`)                 │
+│   • Multi-tile NASA POWER Client (`/api/v1/raster/generate`)           │
+│   • Dynamic Image Serving with Bilinear Alpha Interpolation            │
+│   • Request Ordering & Stale Response Rejection Guard                  │
+└───────────────────────────────────▲────────────────────────────────────┘
+                                    │
+┌───────────────────────────────────▼────────────────────────────────────┐
+│                      SCIENTIFIC ANALYTICS ENGINE                       │
+│   • Vectorized Annual Theil-Sen Median Slope Matrix (NumPy)            │
+│   • Tie-Corrected Mann-Kendall Rank Variance Test (SciPy)              │
+│   • Benjamini-Hochberg False Discovery Rate (FDR) Controller           │
+│   • Climatological De-Seasonalizer & Monthly Baseline Extractor        │
+└───────────────────────────────────▲────────────────────────────────────┘
+                                    │
+┌───────────────────────────────────▼────────────────────────────────────┐
+│                        DATA INGESTION ADAPTERS                         │
+│   • NASA GES DISC GLDAS Noah 2.1 (NetCDF-4 / xarray)                   │
+│   • NASA Langley POWER Regional Multi-Tile API (MERRA-2 Engine)        │
+│   • Persistent Local Disk Caching (.npz grids, PNG rasters)            │
+└────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 8. Quickstart & Local Reproduction Guide
+
+### Prerequisites
+- Python 3.12+ (Anaconda or standard venv)
+- Node.js 18+ and npm
+- NASA Earthdata Cloud account (Optional for custom OPeNDAP downloads; pre-compiled caches included)
+
+### Step 1: Clone Repository
+```bash
+git clone https://github.com/Ravichandranayakar/earthtrend-lens.git
+cd earthtrend-lens
+```
+
+### Step 2: Backend Setup
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -r requirements.txt
+python main.py
+```
+*Backend service listens on `http://127.0.0.1:8000` (API documentation at `http://127.0.0.1:8000/docs`).*
+
+### Step 3: Frontend Setup
+```bash
+cd ../frontend
+npm install
+npm run dev
+```
+*Frontend workspace opens on `http://localhost:5173`.*
+
+### Step 4: Execute Test & Verification Suites
+```bash
+# Run 11-test backend Pytest suite
+pytest backend/tests
+
+# Run full 18-combination matrix benchmark
+python backend/tests/run_18_matrix.py
+
+# Verify production Vite build
+npm run build --prefix frontend
+```
+
+---
+
+## 9. Official NASA Space Apps Submission Structure (7-Slide Deck)
+
+- **Slide 1: Title & The Environmental Detective Question**  
+  *EarthTrend Lens: Unmasking Asymmetric Planetary Trends (Team Synqora).*
+- **Slide 2: The Core Scientific Problem**  
+  *The Aggregation Fallacy and Seasonal Mirage; why dual-domain comparison is required.*
+- **Slide 3: NASA Earth Observation Datasets & Provenance**  
+  *GLDAS Noah 2.1 (0.25° Monthly, GES DISC) and NASA POWER / MERRA-2 Atmospheric Reanalysis.*
+- **Slide 4: The Comparative Forensic Raster Engine**  
+  *Cell-by-cell Theil-Sen median slopes and unified comparative color scales over GIS basemaps.*
+- **Slide 5: Climatological De-Seasonalization & Trend Detection**  
+  *24-year inter-annual anomalies and forensic polarities between Domain A and Domain B.*
+- **Slide 6: Scientific Rigor & Methodological Transparency**  
+  *Open-loop modeling disclosure, dynamic vegetation root depths, and non-causal boundaries.*
+- **Slide 7: Technical Architecture & Public Demonstration Link**  
+  *FastAPI + React/Leaflet architecture, open GitHub repository, and live demonstration.*
+
+---
+
+## 10. License & Attribution
+
+- **Project:** EarthTrend Lens
+- **Challenge:** NASA Space Apps Challenge 2026 — *Be An Earth System Trend Detective!*
+- **License:** MIT Open Source License
+- **NASA GES DISC Citation:** Rodell, M., P. R. Houser, et al. (2004), *The Global Land Data Assimilation System*, Bull. Amer. Meteor. Soc., 85(3), 381-394. DOI: [10.5067/SXAVCZFAQLNO](https://doi.org/10.5067/SXAVCZFAQLNO)
+- **NASA POWER Project Citation:** NASA Langley Research Center POWER Project, MERRA-2 meteorological parameters and GEOS-IT real-time extensions.

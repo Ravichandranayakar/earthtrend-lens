@@ -11,7 +11,12 @@ from app.adapters.earthdata_client import EarthdataClient
 from app.engine.deseasonalizer import compute_monthly_climatology
 from app.engine.stats_engine import compute_mann_kendall_and_sens_slope, compute_benjamini_hochberg_fdr
 from app.engine.gldas_validator import audit_local_gldas_archive
-from app.engine.raster_generator import generate_gldas_mean_raster
+from app.engine.raster_generator import (
+    generate_gldas_scientific_raster,
+    generate_gldas_mean_raster,
+    generate_power_scientific_raster,
+    generate_dual_scientific_rasters
+)
 
 router = APIRouter()
 
@@ -85,7 +90,7 @@ def _execute_analysis(bbox: List[float], variable: str, dataset: str, start_year
         disclaimer = "ILLUSTRATIVE ONLY: Simulated baseline derived from Noah LSM 3.6 parameterization. NOT real NASA GLDAS observational output."
     else:
         disclaimer = (
-            "Statistical trend reflects historical model-assimilated trajectory over the selected domain. "
+            "Statistical trend reflects historical model-derived or reanalysis trajectory over the selected domain. "
             "Mathematical correlation or slope direction does not establish anthropogenic or environmental causation."
         )
     
@@ -424,9 +429,22 @@ def get_spatial_grid(req: SpatialGridRequest):
 
 class RasterRequest(BaseModel):
     bbox: List[float] = Field(..., description="[min_lat, max_lat, min_lon, max_lon]")
-    variable: str = Field(default="RootMoist_inst", description="Target scientific variable")
+    variable: str = Field(default="T2M", description="Target scientific variable (T2M, PRECTOTCORR, RootMoist_inst, GWETROOT)")
+    mode: str = Field(default="mean", description="Raster mode: 'mean', 'trend', 'significance', 'anomaly'")
     start_year: int = Field(default=2000, ge=1981, le=2024)
     end_year: int = Field(default=2024, ge=2000, le=2024)
+    fdr_alpha: float = Field(default=0.05, gt=0, lt=1)
+    smooth: bool = Field(default=True, description="Apply bilinear smoothing for continuous surface")
+
+class DualRasterRequest(BaseModel):
+    bbox_a: List[float] = Field(..., description="Domain A [min_lat, max_lat, min_lon, max_lon]")
+    bbox_b: List[float] = Field(..., description="Domain B [min_lat, max_lat, min_lon, max_lon]")
+    variable: str = Field(default="T2M", description="Target scientific variable")
+    mode: str = Field(default="mean", description="Raster mode: 'mean', 'trend', 'significance', 'anomaly'")
+    start_year: int = Field(default=2000, ge=1981, le=2024)
+    end_year: int = Field(default=2024, ge=2000, le=2024)
+    fdr_alpha: float = Field(default=0.05, gt=0, lt=1)
+    smooth: bool = Field(default=True, description="Apply bilinear smoothing for continuous surface")
 
 class DownloadGranulesRequest(BaseModel):
     start_year: int = 2023
@@ -450,17 +468,61 @@ def download_gldas_granules(req: DownloadGranulesRequest):
         limit=req.limit
     )
 
+@router.post("/raster/generate")
+def generate_scientific_raster(req: RasterRequest):
+    """
+    Generates a peer-reviewed scientific raster overlay for a single geographical domain.
+    Automatically dispatches to NASA POWER or NASA GLDAS based on variable.
+    """
+    if req.variable in ("T2M", "PRECTOTCORR", "GWETROOT"):
+        return generate_power_scientific_raster(
+            bbox=req.bbox,
+            variable=req.variable,
+            mode=req.mode,
+            start_year=req.start_year,
+            end_year=req.end_year,
+            fdr_alpha=req.fdr_alpha,
+            smooth=req.smooth
+        )
+    elif req.variable == "RootMoist_inst":
+        return generate_gldas_scientific_raster(
+            bbox=req.bbox,
+            variable=req.variable,
+            mode=req.mode,
+            start_year=req.start_year,
+            end_year=req.end_year,
+            smooth=req.smooth
+        )
+    else:
+        raise HTTPException(status_code=400, detail=f"Unsupported variable '{req.variable}'.")
+
+@router.post("/raster/dual")
+def generate_dual_rasters(req: DualRasterRequest):
+    """
+    Generates harmonized scientific rasters for Domain A and Domain B with unified color scaling.
+    """
+    return generate_dual_scientific_rasters(
+        bbox_a=req.bbox_a,
+        bbox_b=req.bbox_b,
+        variable=req.variable,
+        mode=req.mode,
+        start_year=req.start_year,
+        end_year=req.end_year,
+        fdr_alpha=req.fdr_alpha,
+        smooth=req.smooth
+    )
+
 @router.post("/raster/mean")
 def generate_mean_soil_moisture_raster(req: RasterRequest):
     """
-    Generates a genuine temporal mean raster directly from validated NASA GLDAS NetCDF archives.
-    Refuses to generate from simulated baselines (returns DATA_UNAVAILABLE if NetCDF files are missing).
+    Backward-compatible endpoint: Generates temporal mean raster directly from validated NASA GLDAS NetCDF archives.
     """
     return generate_gldas_mean_raster(
         bbox=req.bbox,
         start_year=req.start_year,
         end_year=req.end_year,
-        variable=req.variable
+        variable=req.variable,
+        smooth=req.smooth
     )
 
 @router.get("/raster/{raster_id}.png")

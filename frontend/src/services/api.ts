@@ -7,7 +7,7 @@ export const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 15000,
+  timeout: 60000,
 });
 
 export interface VariableItem {
@@ -216,13 +216,31 @@ export async function fetchOppositeTrends(
   return resp.data;
 }
 
+export interface RasterColorStop {
+  stop: number;
+  value: number;
+  hex: string;
+}
+
+export interface RasterColorScale {
+  scale_type: 'sequential' | 'diverging';
+  colormap_name: string;
+  vmin: number;
+  vmax: number;
+  center?: number | null;
+  color_stops: RasterColorStop[];
+}
+
 export interface RasterResponse {
   status: string;
   raster_id?: string;
   raster_url?: string;
+  raster_path?: string;
+  mode?: string;
   layer_type?: string;
   provenance_type?: string;
   dataset_id?: string;
+  source_attribution?: string;
   variable?: string;
   long_name?: string;
   unit?: string;
@@ -237,8 +255,21 @@ export interface RasterResponse {
     min_value: number;
     max_value: number;
     domain_mean: number;
+    significant_cells?: number;
+    significant_percentage?: number;
   };
+  color_scale?: RasterColorScale;
   disclaimer?: string;
+  message?: string;
+}
+
+export interface DualRasterResponse {
+  status: string;
+  mode: string;
+  variable: string;
+  shared_scale: RasterColorScale;
+  domain_a: RasterResponse;
+  domain_b: RasterResponse;
   message?: string;
 }
 
@@ -268,11 +299,58 @@ export async function fetchMeanRaster(params: {
   start_year?: number;
   end_year?: number;
 }): Promise<RasterResponse> {
-  const resp = await apiClient.post('/raster/mean', {
+  const resp = await apiClient.post('/raster/generate', {
     bbox: params.bbox,
     variable: params.variable || 'RootMoist_inst',
+    mode: 'mean',
     start_year: params.start_year || 2000,
     end_year: params.end_year || 2024,
+  });
+  return resp.data;
+}
+
+export async function fetchScientificRaster(params: {
+  bbox: [number, number, number, number];
+  variable?: string;
+  mode?: 'mean' | 'trend' | 'significance' | 'anomaly';
+  start_year?: number;
+  end_year?: number;
+  fdr_alpha?: number;
+  smooth?: boolean;
+}): Promise<RasterResponse> {
+  const resp = await apiClient.post('/raster/generate', {
+    bbox: params.bbox,
+    variable: params.variable || 'T2M',
+    mode: params.mode || 'mean',
+    start_year: params.start_year || 2000,
+    end_year: params.end_year || 2024,
+    fdr_alpha: params.fdr_alpha || 0.05,
+    smooth: params.smooth !== false,
+  });
+  return resp.data;
+}
+
+export async function fetchDualScientificRasters(params: {
+  bbox_a: [number, number, number, number];
+  bbox_b: [number, number, number, number];
+  variable?: string;
+  mode?: 'mean' | 'trend' | 'significance' | 'anomaly';
+  start_year?: number;
+  end_year?: number;
+  fdr_alpha?: number;
+  smooth?: boolean;
+}): Promise<DualRasterResponse> {
+  const resp = await apiClient.post('/raster/dual', {
+    bbox_a: params.bbox_a,
+    bbox_b: params.bbox_b,
+    variable: params.variable || 'T2M',
+    mode: params.mode || 'mean',
+    start_year: params.start_year || 2000,
+    end_year: params.end_year || 2024,
+    fdr_alpha: params.fdr_alpha || 0.05,
+    smooth: params.smooth !== false,
+  }, {
+    timeout: 90000,
   });
   return resp.data;
 }
