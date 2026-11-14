@@ -284,15 +284,6 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
     setValidationA(resA);
     setValidationB(resB);
 
-    // Position tooltips on outer lateral flanks (left/right) so central domain view and rasters are never obstructed
-    const centerLonA = (bboxA[2] + bboxA[3]) / 2;
-    const centerLonB = (bboxB[2] + bboxB[3]) / 2;
-    const isAWestOfB = centerLonA <= centerLonB;
-    const dirA: L.Direction = isAWestOfB ? 'left' : 'right';
-    const dirB: L.Direction = isAWestOfB ? 'right' : 'left';
-    const offsetA: L.PointExpression = isAWestOfB ? [-10, 0] : [10, 0];
-    const offsetB: L.PointExpression = isAWestOfB ? [10, 0] : [-10, 0];
-
     // Domain A (#B96F50 - Terracotta)
     if (resA.isValid && resA.leafletBounds) {
       const rectA = L.rectangle(resA.leafletBounds, {
@@ -302,14 +293,24 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
         fillOpacity: 0.10,
         dashArray: '5, 5',
       });
-
-      rectA.bindTooltip(
-        `<span style="font-family: var(--font-mono); font-size: 10px; font-weight: 600; color: #B96F50; letter-spacing: 0.04em;">DOMAIN A${
-          regionAName ? ` · ${regionAName}` : ''
-        }</span>`,
-        { permanent: true, direction: dirA, offset: offsetA, className: 'domain-leaflet-tooltip' }
-      );
       domainGroup.addLayer(rectA);
+
+      // Pinned top-edge header badge touching boundary with small gap
+      const topLatA = bboxA[1];
+      const centerLonA = (bboxA[2] + bboxA[3]) / 2;
+      const markerA = L.marker([topLatA, centerLonA], {
+        icon: L.divIcon({
+          className: 'domain-edge-tag-wrapper',
+          html: `<div class="domain-edge-tag domain-edge-tag-a">
+            <span class="domain-badge-pill-a">DOMAIN A</span>
+            <span class="domain-badge-label">${regionAName || 'Domain A'}</span>
+          </div>`,
+          iconSize: [0, 0],
+          iconAnchor: [0, 0],
+        }),
+        interactive: false,
+      });
+      domainGroup.addLayer(markerA);
     }
 
     // Domain B (#537D8C - Mineral Blue)
@@ -321,14 +322,24 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
         fillOpacity: 0.10,
         dashArray: '5, 5',
       });
-
-      rectB.bindTooltip(
-        `<span style="font-family: var(--font-mono); font-size: 10px; font-weight: 600; color: #537D8C; letter-spacing: 0.04em;">DOMAIN B${
-          regionBName ? ` · ${regionBName}` : ''
-        }</span>`,
-        { permanent: true, direction: dirB, offset: offsetB, className: 'domain-leaflet-tooltip' }
-      );
       domainGroup.addLayer(rectB);
+
+      // Pinned top-edge header badge touching boundary with small gap
+      const topLatB = bboxB[1];
+      const centerLonB = (bboxB[2] + bboxB[3]) / 2;
+      const markerB = L.marker([topLatB, centerLonB], {
+        icon: L.divIcon({
+          className: 'domain-edge-tag-wrapper',
+          html: `<div class="domain-edge-tag domain-edge-tag-b">
+            <span class="domain-badge-pill-b">DOMAIN B</span>
+            <span class="domain-badge-label">${regionBName || 'Domain B'}</span>
+          </div>`,
+          iconSize: [0, 0],
+          iconAnchor: [0, 0],
+        }),
+        interactive: false,
+      });
+      domainGroup.addLayer(markerB);
     }
   }, [bboxA, bboxB, regionAName, regionBName]);
 
@@ -1142,6 +1153,114 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
       </div>
 
       <style>{`
+        .domain-edge-tag-wrapper {
+          background: transparent !important;
+          border: none !important;
+        }
+        .domain-edge-tag {
+          position: absolute;
+          bottom: 14px;
+          left: 50%;
+          transform: translateX(-50%);
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          padding: 2px 7px;
+          background: rgba(255, 255, 255, 0.98);
+          border-radius: 4px;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+          white-space: nowrap;
+          pointer-events: none;
+          font-family: var(--font-sans);
+          font-size: 10px;
+          line-height: 1.2;
+        }
+        .domain-edge-tag-a {
+          border: 1px solid #B96F50;
+          border-bottom: 2px solid #B96F50;
+        }
+        .domain-edge-tag-b {
+          border: 1px solid #537D8C;
+          border-bottom: 2px solid #537D8C;
+        }
+        .domain-badge-pill-a {
+          font-family: var(--font-mono);
+          font-weight: 700;
+          font-size: 9px;
+          color: #ffffff;
+          background: #B96F50;
+          padding: 1px 4px;
+          border-radius: 2px;
+          letter-spacing: 0.04em;
+        }
+        .domain-badge-pill-b {
+          font-family: var(--font-mono);
+          font-weight: 700;
+          font-size: 9px;
+          color: #ffffff;
+          background: #537D8C;
+          padding: 1px 4px;
+          border-radius: 2px;
+          letter-spacing: 0.04em;
+        }
+        .domain-badge-label {
+          font-weight: 600;
+          color: var(--color-graphite);
+        }
+        .domain-edge-tag-wrapper {
+          background: transparent !important;
+          border: none !important;
+        }
+        .domain-edge-tag {
+          position: absolute;
+          bottom: 14px;
+          left: 50%;
+          transform: translateX(-50%);
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          padding: 2px 7px;
+          background: rgba(255, 255, 255, 0.98);
+          border-radius: 4px;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+          white-space: nowrap;
+          pointer-events: none;
+          font-family: var(--font-sans);
+          font-size: 10px;
+          line-height: 1.2;
+        }
+        .domain-edge-tag-a {
+          border: 1px solid #B96F50;
+          border-bottom: 2px solid #B96F50;
+        }
+        .domain-edge-tag-b {
+          border: 1px solid #537D8C;
+          border-bottom: 2px solid #537D8C;
+        }
+        .domain-badge-pill-a {
+          font-family: var(--font-mono);
+          font-weight: 700;
+          font-size: 9px;
+          color: #ffffff;
+          background: #B96F50;
+          padding: 1px 4px;
+          border-radius: 2px;
+          letter-spacing: 0.04em;
+        }
+        .domain-badge-pill-b {
+          font-family: var(--font-mono);
+          font-weight: 700;
+          font-size: 9px;
+          color: #ffffff;
+          background: #537D8C;
+          padding: 1px 4px;
+          border-radius: 2px;
+          letter-spacing: 0.04em;
+        }
+        .domain-badge-label {
+          font-weight: 600;
+          color: var(--color-graphite);
+        }
         .domain-leaflet-tooltip {
           background-color: rgba(255, 255, 255, 0.96) !important;
           border: 1px solid var(--color-border) !important;
