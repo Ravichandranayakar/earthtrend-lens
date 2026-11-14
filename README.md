@@ -171,9 +171,9 @@ Total Configurations: 18 | Passed: 18 | Failed: 0 | Availability: 100%
 ```text
 ┌────────────────────────────────────────────────────────────────────────┐
 │                        PRESENTATION TIER (UI)                          │
-│     React 18 • Vite • Tailwind CSS • Leaflet GIS • Plotly.js Engine     │
+│     React 18 • Vite • Tailwind CSS • Leaflet GIS • Plotly.js Engine    │
 │   • Screen 1: Investigate Workspace & Dual-Domain GIS Overlay Map      │
-│   • Screen 2: De-seasonalized Analysis & Forensic Polarity Scorecard    │
+│   • Screen 2: De-seasonalized Analysis & Forensic Polarity Scorecard   │
 │   • Screen 3: Spatial Explorer Cell Grid & Telemetry Inspector         │
 │   • Screen 4: Data & Methods Scientific Provenance Documentation       │
 └───────────────────────────────────▲────────────────────────────────────┘
