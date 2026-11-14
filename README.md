@@ -2,15 +2,14 @@
 
 [![NASA Space Apps Challenge 2026](https://img.shields.io/badge/NASA%20Space%20Apps-2026-blue.svg)](https://www.spaceappschallenge.org/)
 [![Challenge](https://img.shields.io/badge/Challenge-Earth%20System%20Trend%20Detective-orange.svg)](https://www.spaceappschallenge.org/2026/challenges/earth-system-trend-detective/)
-[![Live Link](https://img.shields.io/badge/Live%20Demo-earthtrend--lens.onrender.com-success.svg)](https://earthtrend-lens.onrender.com)
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-earthtrend--lens.onrender.com-success.svg)](https://earthtrend-lens.onrender.com)
 [![FastAPI](https://img.shields.io/badge/Backend-FastAPI%20%7C%20Python%203.12-009688.svg)](https://fastapi.tiangolo.com)
 [![React](https://img.shields.io/badge/Frontend-React%2019%20%7C%20Vite%20%7C%20Tailwind-61DAFB.svg)](https://vitejs.dev)
 [![DOI](https://img.shields.io/badge/NASA%20GLDAS%20DOI-10.5067%2FSXAVCZFAQLNO-red.svg)](https://doi.org/10.5067/SXAVCZFAQLNO)
 [![Matrix QA](https://img.shields.io/badge/QA%20Matrix-18%2F18%20PASS-brightgreen.svg)]()
 
-> **NASA Space Apps Challenge 2026** — Global Finalist Submission  
-> **Team:** Synqora
+> **NASA Space Apps Challenge 2026**
+> **Team:** Synqora  
 > **Live Web Application:** [https://earthtrend-lens.onrender.com](https://earthtrend-lens.onrender.com)  
 > **Scientific API Service:** [https://earthtrend-lens-backend.onrender.com](https://earthtrend-lens-backend.onrender.com)  
 
