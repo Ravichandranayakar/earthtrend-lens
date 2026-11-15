@@ -213,9 +213,9 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         /* Desktop preservation defaults (>= 960px) */
         .navbar-container {
-          max-width: 1400px;
+          max-width: 1520px;
           margin: 0 auto;
-          padding: 0 24px;
+          padding: 0 20px;
           display: flex;
           align-items: center;
           justify-content: space-between;

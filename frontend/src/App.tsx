@@ -938,33 +938,88 @@ export function App() {
         style={{
           borderTop: '1px solid var(--color-border)',
           background: 'var(--color-white)',
-          padding: '12px 24px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 16,
-          flexWrap: 'wrap',
+          padding: '10px 20px',
         }}
       >
-        <span
+        <div
           style={{
-            fontFamily: 'var(--font-sans)',
-            fontSize: 11,
-            color: 'var(--color-slate-text)',
+            maxWidth: 1520,
+            margin: '0 auto',
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 16,
+            flexWrap: 'wrap',
           }}
         >
-          Team Synqora · NASA Space Apps Challenge 2026
-        </span>
-        <span
-          style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: 10,
-            color: 'var(--color-slate-text)',
-            opacity: 0.7,
-          }}
-        >
-          NASA GES DISC · DOI: 10.5067/SXAVCZFAQLNO · NASA Langley POWER
-        </span>
+          <div
+            style={{
+              fontFamily: 'var(--font-sans)',
+              fontSize: 11,
+              color: 'var(--color-slate-text)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+            }}
+          >
+            <span style={{ fontWeight: 600, color: 'var(--color-forest)' }}>Team Synqora</span>
+            <span>·</span>
+            <span>NASA Space Apps Challenge 2026</span>
+          </div>
+
+          <div
+            style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: 11,
+              color: 'var(--color-slate-text)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              flexWrap: 'wrap',
+            }}
+          >
+            <a
+              href="https://disc.gsfc.nasa.gov/datasets/GLDAS_NOAH025_M_2.1/summary"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: 'inherit', textDecoration: 'none' }}
+              className="hover:underline hover:text-emerald-700 transition-colors"
+            >
+              NASA GES DISC
+            </a>
+            <span>·</span>
+            <a
+              href="https://doi.org/10.5067/SXAVCZFAQLNO"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: 'var(--color-mineral-blue)', textDecoration: 'none' }}
+              className="hover:underline transition-colors"
+            >
+              DOI: 10.5067/SXAVCZFAQLNO
+            </a>
+            <span>·</span>
+            <a
+              href="https://power.larc.nasa.gov/"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: 'inherit', textDecoration: 'none' }}
+              className="hover:underline hover:text-emerald-700 transition-colors"
+            >
+              NASA Langley POWER
+            </a>
+            <span>·</span>
+            <a
+              href="https://github.com/Ravichandranayakar/earthtrend-lens"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: 'inherit', textDecoration: 'none', fontWeight: 500 }}
+              className="hover:underline hover:text-emerald-700 transition-colors"
+            >
+              GitHub ↗
+            </a>
+          </div>
+        </div>
       </footer>
     </div>
   );
