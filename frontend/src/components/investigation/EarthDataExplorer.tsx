@@ -89,7 +89,7 @@ export const EarthDataExplorer: React.FC<EarthDataExplorerProps> = ({
       {/* Header */}
       <div>
         <p className="section-label" style={{ marginBottom: 4 }}>
-          Microsoft Planetary Computer STAC Discovery
+          Earth Observation STAC Discovery
         </p>
         <p
           style={{
@@ -100,7 +100,7 @@ export const EarthDataExplorer: React.FC<EarthDataExplorerProps> = ({
             lineHeight: 1.5,
           }}
         >
-          Discover and inspect supplementary Earth observation collections via open STAC endpoints.
+          Discover and inspect supplementary NASA & partner Earth observation collections via open STAC endpoints.
         </p>
       </div>
 
