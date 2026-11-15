@@ -169,8 +169,6 @@ Total Configurations: 18 | Passed: 18 | Failed: 0 | Availability: 100%
 
 ---
 
----
-
 All 18 configurations across the 3 presets, 3 environmental variables and 2 visualisation modes were tested against the live API gateway.
 
 Total Configurations: 18
