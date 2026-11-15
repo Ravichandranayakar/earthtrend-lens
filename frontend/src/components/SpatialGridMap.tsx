@@ -75,6 +75,8 @@ export const SpatialGridMap: React.FC<SpatialGridMapProps> = ({
   const [layerMode, setLayerMode] = useState<LayerMode>('slope');
   const [showStippling, setShowStippling] = useState<boolean>(true);
   const [cellOpacity, setCellOpacity] = useState<number>(0.65);
+  const [basemapMode, setBasemapMode] = useState<'geography' | 'satellite'>('geography');
+  const satelliteLayerRef = useRef<L.TileLayer | null>(null);
 
   // Inspector & Cursor states
   const [hoveredCell, setHoveredCell] = useState<SpatialGridCell | null>(null);
@@ -176,6 +178,17 @@ export const SpatialGridMap: React.FC<SpatialGridMapProps> = ({
       }
     ).addTo(map);
 
+    // World Satellite Imagery Layer
+    const satelliteLayer = L.tileLayer(
+      'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+      {
+        maxZoom: 18,
+        attribution: 'Tiles &copy; Esri, Earthstar Geographics',
+        opacity: 0,
+      }
+    ).addTo(map);
+    satelliteLayerRef.current = satelliteLayer;
+
     // Canvas Renderer for fast vector rendering
     const canvasRenderer = L.canvas({ padding: 0.5 });
     canvasRendererRef.current = canvasRenderer;
@@ -222,6 +235,7 @@ export const SpatialGridMap: React.FC<SpatialGridMapProps> = ({
     return () => {
       resizeObserver.disconnect();
       map.remove();
+      satelliteLayerRef.current = null;
       mapInstanceRef.current = null;
       boundaryLayerGroupRef.current = null;
       cellLayerGroupARef.current = null;
@@ -231,6 +245,17 @@ export const SpatialGridMap: React.FC<SpatialGridMapProps> = ({
       canvasRendererRef.current = null;
     };
   }, [resolvedBboxA, resolvedBboxB]);
+
+  // Synchronize basemap mode with satellite layer opacity
+  useEffect(() => {
+    const satellite = satelliteLayerRef.current;
+    if (!satellite) return;
+    if (basemapMode === 'satellite') {
+      satellite.setOpacity(0.92);
+    } else {
+      satellite.setOpacity(0);
+    }
+  }, [basemapMode]);
 
   // 2. Render Domain Bounding Outlines
   useEffect(() => {
@@ -373,6 +398,17 @@ export const SpatialGridMap: React.FC<SpatialGridMapProps> = ({
     const combined = L.latLngBounds(boundsA.getSouthWest(), boundsA.getNorthEast()).extend(boundsB);
     mapInstanceRef.current.flyToBounds(combined, { padding: [45, 45], duration: 0.7 });
   }, [resolvedBboxA, resolvedBboxB]);
+
+  // Synchronize basemap mode with satellite layer opacity
+  useEffect(() => {
+    const satellite = satelliteLayerRef.current;
+    if (!satellite) return;
+    if (basemapMode === 'satellite') {
+      satellite.setOpacity(0.92);
+    } else {
+      satellite.setOpacity(0);
+    }
+  }, [basemapMode]);
 
   const handleFocusA = useCallback(() => {
     if (!mapInstanceRef.current) return;
@@ -807,6 +843,47 @@ export const SpatialGridMap: React.FC<SpatialGridMapProps> = ({
           {/* Leaflet Map Target */}
           <div ref={mapContainerRef} style={{ flex: 1, width: '100%', height: '100%', background: '#F5F4ED' }} />
 
+          {/* Floating Map Controls HUD (Top-Right): Basemap Toggle */}
+          <div
+            style={{
+              position: 'absolute',
+              top: 12,
+              right: 12,
+              zIndex: 1000,
+              display: 'flex',
+              alignItems: 'center',
+              background: 'rgba(255, 255, 255, 0.96)',
+              backdropFilter: 'blur(4px)',
+              border: '1px solid var(--color-border)',
+              borderRadius: 'var(--radius-md)',
+              boxShadow: '0 2px 6px rgba(0,0,0,0.08)',
+              overflow: 'hidden',
+            }}
+          >
+            <button
+              onClick={() => setBasemapMode((prev) => (prev === 'geography' ? 'satellite' : 'geography'))}
+              title={`Basemap: ${basemapMode === 'geography' ? 'Light Geography' : 'Satellite Imagery'}. Click to toggle.`}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '6px 12px',
+                background: basemapMode === 'satellite' ? 'var(--color-forest)' : 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                color: basemapMode === 'satellite' ? '#ffffff' : 'var(--color-graphite)',
+                fontFamily: 'var(--font-sans)',
+                fontSize: 11,
+                fontWeight: 600,
+                transition: 'all 150ms ease',
+              }}
+              aria-label="Toggle basemap"
+            >
+              <Layers size={13} />
+              <span>{basemapMode === 'satellite' ? 'Satellite' : 'Geography'}</span>
+            </button>
+          </div>
+
           {/* Map Footer HUD */}
           <div
             style={{
@@ -842,7 +919,9 @@ export const SpatialGridMap: React.FC<SpatialGridMapProps> = ({
               <span style={{ color: 'var(--color-border)' }}>|</span>
               <span style={{ color: '#537D8C' }}>Domain B: [{resolvedBboxB.join('°, ')}°]</span>
               <span style={{ color: 'var(--color-border)' }}>|</span>
-              <span style={{ opacity: 0.85 }}>Esri Light Gray Canvas &copy; Esri, OSM</span>
+              <span style={{ opacity: 0.85 }}>
+                {basemapMode === 'satellite' ? 'Esri World Imagery © Esri' : 'Esri Light Gray Canvas © Esri, OSM'}
+              </span>
             </div>
           </div>
         </div>
