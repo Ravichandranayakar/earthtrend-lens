@@ -73,8 +73,9 @@ export interface PresetCase {
   id: string;
   title: string;
   variable: string;
-  secondary_variable: string;
-  soil_variable: string;
+  secondary_variable?: string;
+  soil_variable?: string;
+  dataset?: string;
   timeframe: [number, number];
   narrative: string;
   region_a: {
@@ -130,6 +131,11 @@ export interface RegionAnalysis {
     metadata: {
       source: string;
       doi: string;
+      provenance_type?: string;
+      is_illustrative?: boolean;
+      depth_note?: string;
+      total_observations?: number;
+      disclaimer?: string;
       variable: string;
       unit: string;
       bbox: [number, number, number, number];
