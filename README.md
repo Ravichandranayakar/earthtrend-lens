@@ -50,10 +50,10 @@ The interface integrates three synchronized scientific layers: Esri World Light 
 ---
 
 ### C. Forensic Time-Series Analysis & Cell-by-Cell Spatial Explorer
-| 24-Year De-seasonalized Anomalies | Interactive Spatial Grid & Cell Inspector |
+| 25-Year De-seasonalized Anomalies (2000–2024) | Interactive Spatial Grid & Cell Inspector |
 | :---: | :---: |
 | ![Analysis View](images/05_analysis_timeseries_anomalies.png) | ![Spatial Explorer](images/06_spatial_explorer_grid_telemetry.png) |
-| *Figure 4: Annual anomaly series and forensic scorecards.* | *Figure 5: Clickable 0.5° grid cells with Theil-Sen slope telemetry.* |
+| *Figure 4: Annual anomaly series and forensic scorecards.* | *Figure 5: Clickable spatial grid cells with Theil-Sen slope telemetry.* |
 
 ---
 
@@ -118,7 +118,7 @@ Raw NASA Monthly Series (X_y,m)
          │
          ▼
 [1] Climatological De-Seasonalization
-    ΔX_y,m = X_y,m - X̄_m  (Subtracting 24-year monthly baseline)
+    ΔX_y,m = X_y,m - X̄_m  (Subtracting 25-year monthly climatological baseline)
          │
          ▼
 [2] Theil-Sen Robust Median Slope Estimator
@@ -219,7 +219,7 @@ The application is deployed across global high-availability edge infrastructure 
 - **Service Health Probe:** [https://earthtrend-lens-backend.onrender.com/health](https://earthtrend-lens-backend.onrender.com/health)
 
 > **Evaluation Guide for Reviewers & Judges:**  
-> To provide an immediate and seamless review experience, the three demonstration presets (**Europe Hydrology**, **US Megadrought**, and **Sahel vs Siberia**) serve pre-computed, peer-reviewed NASA raster layers and statistical models instantly from the CDN edge. When exploring custom bounding boxes outside the presets, please kindly allow 30–45 seconds on the initial request for the live analytical compute instance to spin up from an idle state. Subsequent custom calculations will respond smoothly with rapid execution.
+> To provide an immediate and seamless review experience, the three demonstration presets (**Europe Hydrology**, **US Megadrought**, and **Sahel vs Siberia**) serve pre-computed spatial rasters and statistical models derived from peer-reviewed NASA datasets instantly from static edge hosting. When exploring custom bounding boxes outside the presets, please kindly allow 30–45 seconds on the initial request for the live analytical compute instance to spin up from an idle state. Subsequent custom calculations will respond smoothly with rapid execution.
 
 ---
 
