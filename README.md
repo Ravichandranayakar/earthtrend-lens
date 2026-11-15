@@ -1,4 +1,5 @@
-# EarthTrend Lens: Forensic Earth-System Trend Detective & Spatial Disparity Workbench
+# EarthTrend Lens
+# An Interactive Earth-System Trend Analysis and Spatial Comparison Workbench
 
 [![NASA Space Apps Challenge 2026](https://img.shields.io/badge/NASA%20Space%20Apps-2026-blue.svg)](https://www.spaceappschallenge.org/)
 [![Challenge](https://img.shields.io/badge/Challenge-Earth%20System%20Trend%20Detective-orange.svg)](https://www.spaceappschallenge.org/2026/challenges/earth-system-trend-detective/)
