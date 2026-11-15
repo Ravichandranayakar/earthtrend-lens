@@ -169,6 +169,20 @@ Total Configurations: 18 | Passed: 18 | Failed: 0 | Availability: 100%
 
 ---
 
+---
+
+All 18 configurations across the 3 presets, 3 environmental variables and 2 visualisation modes were tested against the live API gateway.
+
+Total Configurations: 18
+Passed: 18
+Failed: 0
+Test Pass Rate: 100%
+
+All tested configurations returned successful responses during this validation run. The results document configuration-level compatibility, raster generation and observed request latency; they do not represent a continuous service-availability measurement.
+
+---
+
+
 ## 7. System Architecture
 
 ```text
