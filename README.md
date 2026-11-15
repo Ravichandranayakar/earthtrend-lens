@@ -3,7 +3,7 @@
 [![NASA Space Apps Challenge 2026](https://img.shields.io/badge/NASA%20Space%20Apps-2026-blue.svg)](https://www.spaceappschallenge.org/)
 [![Challenge](https://img.shields.io/badge/Challenge-Earth%20System%20Trend%20Detective-orange.svg)](https://www.spaceappschallenge.org/2026/challenges/earth-system-trend-detective/)
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-earthtrend--lens.onrender.com-success.svg)](https://earthtrend-lens.onrender.com)
-[![YouTube Demo](https://img.shields.io/badge/Demo%20Video-30s%20Showcase-red.svg?logo=youtube)](https://youtu.be/bpYRfkh7j1I)
+[![YouTube Demo](https://youtu.be/lpAHeTiu7Os?si=gQSMXngUdonfmE6T)](https://youtu.be/bpYRfkh7j1I)
 [![FastAPI](https://img.shields.io/badge/Backend-FastAPI%20%7C%20Python%203.12-009688.svg)](https://fastapi.tiangolo.com)
 [![React](https://img.shields.io/badge/Frontend-React%2019%20%7C%20Vite%20%7C%20Tailwind-61DAFB.svg)](https://vitejs.dev)
 [![DOI](https://img.shields.io/badge/NASA%20GLDAS%20DOI-10.5067%2FSXAVCZFAQLNO-red.svg)](https://doi.org/10.5067/SXAVCZFAQLNO)
