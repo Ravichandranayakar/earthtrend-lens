@@ -100,7 +100,7 @@ export const EarthDataExplorer: React.FC<EarthDataExplorerProps> = ({
             lineHeight: 1.5,
           }}
         >
-          Discover and inspect supplementary NASA & partner Earth observation collections via open STAC endpoints.
+          Inspect open-access SpatioTemporal Asset Catalogs (STAC) for supplementary NASA & partner collections.
         </p>
       </div>
 
