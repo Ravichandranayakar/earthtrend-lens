@@ -213,7 +213,7 @@ Total Configurations: 18 | Passed: 18 | Failed: 0 | Availability: 100%
 The application is deployed across global high-availability edge infrastructure for public demonstration and judging evaluation:
 
 - **Public Web Application:** [https://earthtrend-lens.onrender.com](https://earthtrend-lens.onrender.com)
-- **30-Second Video Demonstration:** [https://youtu.be/bpYRfkh7j1I](https://youtu.be/bpYRfkh7j1I)
+- **30-Second Video Demonstration:** [https://youtu.be/bpYRfkh7j1I](https://youtu.be/lpAHeTiu7Os?si=gQSMXngUdonfmE6T)
 - **FastAPI Scientific Backend:** [https://earthtrend-lens-backend.onrender.com](https://earthtrend-lens-backend.onrender.com)
 - **Interactive Swagger Documentation:** [https://earthtrend-lens-backend.onrender.com/docs](https://earthtrend-lens-backend.onrender.com/docs)
 - **Service Health Probe:** [https://earthtrend-lens-backend.onrender.com/health](https://earthtrend-lens-backend.onrender.com/health)
