@@ -790,15 +790,7 @@ export const SpatialGridMap: React.FC<SpatialGridMapProps> = ({
       </div>
 
       {/* Main Split: 70% Left GIS Map + 30% Right Docked Inspector */}
-      <div
-        className="spatial-grid-workbench-grid"
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'minmax(0, 7fr) minmax(330px, 3fr)',
-          gap: 16,
-          alignItems: 'stretch',
-        }}
-      >
+      <div className="spatial-grid-workbench-grid">
         {/* LEFT 70%: Real Interactive Cartographic Leaflet Map */}
         <div
           style={{

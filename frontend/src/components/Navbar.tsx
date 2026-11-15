@@ -35,6 +35,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   return (
     <header
+      className="navbar-header"
       style={{
         background: 'var(--color-deep-forest)',
         borderBottom: '1px solid rgba(255,255,255,0.08)',
@@ -43,28 +44,18 @@ export const Navbar: React.FC<NavbarProps> = ({
         zIndex: 50,
       }}
     >
-      <div
-        style={{
-          maxWidth: 1400,
-          margin: '0 auto',
-          padding: '0 24px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          height: 56,
-          gap: 24,
-        }}
-      >
+      <div className="navbar-container">
         {/* LEFT: Brand Mark */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
+        <div className="navbar-brand">
           {/* Geometric SVG brand mark — contour/orbital lines */}
           <svg
-            width="30"
-            height="30"
+            width="28"
+            height="28"
             viewBox="0 0 30 30"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
             aria-hidden="true"
+            style={{ flexShrink: 0 }}
           >
             <circle cx="15" cy="15" r="13" stroke="#A5B69A" strokeWidth="1.2" fill="none" />
             <ellipse cx="15" cy="15" rx="7" ry="13" stroke="#617B62" strokeWidth="1" fill="none" />
@@ -75,37 +66,56 @@ export const Navbar: React.FC<NavbarProps> = ({
           </svg>
 
           <div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, flexWrap: 'nowrap' }}>
               <span
                 style={{
                   fontFamily: 'var(--font-serif)',
-                  fontSize: 17,
+                  fontSize: 16,
                   fontWeight: 600,
                   color: '#ffffff',
                   letterSpacing: '-0.01em',
                   lineHeight: 1.2,
+                  whiteSpace: 'nowrap',
                 }}
               >
                 EarthTrend Lens
               </span>
               <span
+                className="hidden sm:inline"
                 style={{
                   fontFamily: 'var(--font-mono)',
                   fontSize: 10,
                   color: 'var(--color-sage)',
                   opacity: 0.8,
                   letterSpacing: '0.04em',
+                  whiteSpace: 'nowrap',
                 }}
               >
                 NASA Space Apps 2026
               </span>
             </div>
           </div>
+
+          {isLoading && (
+            <div
+              className="navbar-spinner-mobile"
+              style={{
+                width: 14,
+                height: 14,
+                borderRadius: '50%',
+                border: '2px solid rgba(255,255,255,0.15)',
+                borderTopColor: 'var(--color-sage)',
+                animation: 'spin 0.8s linear infinite',
+                marginLeft: 'auto',
+                flexShrink: 0,
+              }}
+            />
+          )}
         </div>
 
         {/* CENTER: Primary Navigation */}
         <nav
-          style={{ display: 'flex', alignItems: 'center', gap: 2 }}
+          className="navbar-nav"
           role="navigation"
           aria-label="Primary navigation"
         >
@@ -115,18 +125,20 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 key={item.id}
                 onClick={() => onSelectTab(item.id)}
+                className="navbar-tab-btn"
                 style={{
                   fontFamily: 'var(--font-sans)',
-                  fontSize: 13,
+                  fontSize: 12.5,
                   fontWeight: isActive ? 600 : 400,
-                  color: isActive ? '#ffffff' : 'rgba(255,255,255,0.55)',
-                  background: isActive ? 'rgba(255,255,255,0.1)' : 'transparent',
+                  color: isActive ? '#ffffff' : 'rgba(255,255,255,0.65)',
+                  background: isActive ? 'rgba(255,255,255,0.12)' : 'transparent',
                   border: 'none',
                   borderRadius: 6,
-                  padding: '6px 14px',
+                  padding: '5px 11px',
                   cursor: 'pointer',
                   transition: 'all 150ms ease',
                   whiteSpace: 'nowrap',
+                  flexShrink: 0,
                 }}
                 aria-current={isActive ? 'page' : undefined}
               >
@@ -137,13 +149,14 @@ export const Navbar: React.FC<NavbarProps> = ({
         </nav>
 
         {/* RIGHT: Preset Quick-Select + Status */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+        <div className="navbar-presets">
           <span
             style={{
               fontFamily: 'var(--font-sans)',
               fontSize: 11,
               color: 'rgba(255,255,255,0.4)',
-              marginRight: 4,
+              marginRight: 2,
+              whiteSpace: 'nowrap',
             }}
           >
             Preset:
@@ -164,11 +177,12 @@ export const Navbar: React.FC<NavbarProps> = ({
                   border: '1px solid',
                   borderColor: isSelected ? 'var(--color-sage)' : 'rgba(255,255,255,0.1)',
                   borderRadius: 100,
-                  padding: '4px 11px',
+                  padding: '3px 9px',
                   cursor: isLoading ? 'not-allowed' : 'pointer',
                   transition: 'all 150ms ease',
                   opacity: isLoading ? 0.6 : 1,
                   whiteSpace: 'nowrap',
+                  flexShrink: 0,
                 }}
               >
                 {PRESET_LABELS[preset.id] ?? preset.title}
@@ -178,14 +192,15 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {isLoading && (
             <div
+              className="navbar-spinner-desktop"
               style={{
-                width: 16,
-                height: 16,
+                width: 14,
+                height: 14,
                 borderRadius: '50%',
                 border: '2px solid rgba(255,255,255,0.15)',
                 borderTopColor: 'var(--color-sage)',
                 animation: 'spin 0.8s linear infinite',
-                marginLeft: 8,
+                marginLeft: 4,
                 flexShrink: 0,
               }}
             />
@@ -195,6 +210,94 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Desktop preservation defaults (>= 960px) */
+        .navbar-container {
+          max-width: 1400px;
+          margin: 0 auto;
+          padding: 0 24px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          height: 56px;
+          gap: 20px;
+        }
+        .navbar-brand {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          flex-shrink: 0;
+        }
+        .navbar-nav {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+        .navbar-presets {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          flex-shrink: 0;
+        }
+        .navbar-spinner-mobile {
+          display: none;
+        }
+        .navbar-spinner-desktop {
+          display: block;
+        }
+
+        /* Mobile & Tablet Adaptation (< 960px) */
+        @media (max-width: 959px) {
+          .navbar-container {
+            height: auto;
+            padding: 8px 14px;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 8px;
+          }
+          .navbar-brand {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+          }
+          .navbar-spinner-mobile {
+            display: block;
+          }
+          .navbar-spinner-desktop {
+            display: none;
+          }
+          .navbar-nav {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            overflow-x: auto;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            padding-bottom: 2px;
+          }
+          .navbar-nav::-webkit-scrollbar {
+            display: none;
+          }
+          .navbar-presets {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            overflow-x: auto;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            padding-bottom: 2px;
+          }
+          .navbar-presets::-webkit-scrollbar {
+            display: none;
+          }
+          .navbar-tab-btn {
+            padding: 6px 12px !important;
+            font-size: 13px !important;
+          }
+        }
       `}</style>
     </header>
   );

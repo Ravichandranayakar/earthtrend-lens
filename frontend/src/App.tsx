@@ -507,9 +507,8 @@ export function App() {
         >
           {/* Compact editorial header banner */}
           <div
+            className="investigate-subbar"
             style={{
-              height: 34,
-              padding: '0 20px',
               borderBottom: '1px solid var(--color-border)',
               background: 'var(--color-white)',
               display: 'flex',
@@ -783,12 +782,12 @@ export function App() {
       {/* ── TAB: ANALYSIS ───────────────────────────────────── */}
       {activeTab === 'analysis' && (
         <main
+          className="analysis-main-container"
           style={{
             flex: 1,
             maxWidth: 1360,
             width: '100%',
             margin: '0 auto',
-            padding: '28px 24px',
             display: 'flex',
             flexDirection: 'column',
             gap: 20,
@@ -825,7 +824,7 @@ export function App() {
               <Suspense fallback={<div style={{ padding: 24, textAlign: 'center', color: 'var(--color-slate-text)', fontSize: 13, background: 'var(--color-white)', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)' }}>Loading timeseries chart engine...</div>}>
                 <DeseasonalizerChart data={analysisData} />
               </Suspense>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <div className="analysis-scorecards-grid">
                 <ForensicScorecard region={analysisData.region_a} colorTheme="crimson" />
                 <ForensicScorecard region={analysisData.region_b} colorTheme="teal" />
               </div>
@@ -839,12 +838,12 @@ export function App() {
       {/* ── TAB: SPATIAL EXPLORER ───────────────────────────── */}
       {activeTab === 'spatial' && (
         <main
+          className="spatial-main-container"
           style={{
             flex: 1,
             maxWidth: 1360,
             width: '100%',
             margin: '0 auto',
-            padding: '28px 24px',
             display: 'flex',
             flexDirection: 'column',
             gap: 20,
@@ -895,12 +894,12 @@ export function App() {
       {/* ── TAB: DATA & METHODS ─────────────────────────────── */}
       {activeTab === 'methods' && (
         <main
+          className="methods-main-container"
           style={{
             flex: 1,
             maxWidth: 1360,
             width: '100%',
             margin: '0 auto',
-            padding: '28px 24px',
           }}
         >
           <div style={{ marginBottom: 20 }}>
@@ -935,6 +934,7 @@ export function App() {
 
       {/* Footer */}
       <footer
+        className="app-footer"
         style={{
           borderTop: '1px solid var(--color-border)',
           background: 'var(--color-white)',
