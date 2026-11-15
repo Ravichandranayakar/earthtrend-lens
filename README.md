@@ -216,7 +216,8 @@ The application is deployed across global high-availability edge infrastructure 
 - **Interactive Swagger Documentation:** [https://earthtrend-lens-backend.onrender.com/docs](https://earthtrend-lens-backend.onrender.com/docs)
 - **Service Health Probe:** [https://earthtrend-lens-backend.onrender.com/health](https://earthtrend-lens-backend.onrender.com/health)
 
-> **Judges' Operational Note:** The static frontend CDN serves authentic, peer-reviewed raster layers for all three demonstration presets instantly with 0 ms network delay. When evaluating custom geographic bounding boxes, please allow 30–50 seconds for the free-tier backend compute node to spin up from idle state if previously dormant.
+> **Evaluation Guide for Reviewers & Judges:**  
+> To provide an immediate and seamless review experience, the three demonstration presets (**Europe Hydrology**, **US Megadrought**, and **Sahel vs Siberia**) serve pre-computed, peer-reviewed NASA raster layers and statistical models instantly from the CDN edge. When exploring custom bounding boxes outside the presets, please kindly allow 30–45 seconds on the initial request for the live analytical compute instance to spin up from an idle state. Subsequent custom calculations will respond smoothly with rapid execution.
 
 ---
 
