@@ -134,6 +134,12 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
   const [loadingElapsedSec, setLoadingElapsedSec] = useState<number>(0);
   const [rasterError, setRasterError] = useState<string | null>(null);
   const activeRequestIdRef = useRef<number>(0);
+  const [isLegendCollapsed, setIsLegendCollapsed] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth < 768;
+    }
+    return false;
+  });
 
   // Timer for transparent, honest elapsed time tracking during live calculations
   useEffect(() => {
@@ -559,6 +565,7 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
     >
       {/* ── Top GIS Toolbar (Pinned) ───────────────────────────────── */}
       <div
+        className="map-header-hud"
         style={{
           minHeight: 44,
           padding: '6px 14px',
@@ -927,117 +934,164 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
         {/* ── Dynamic Scientific Colorbar Legend (Floating HUD) ──────── */}
         {showScientificRaster && dualRasterData && dualRasterData.status === 'SUCCESS' && (
           <div
+            className="map-legend-hud"
             style={{
               position: 'absolute',
-              bottom: 14,
-              right: 14,
+              bottom: 12,
+              right: 12,
               zIndex: 1000,
               background: 'rgba(255, 255, 255, 0.96)',
-              padding: '10px 14px',
+              padding: isLegendCollapsed ? '6px 12px' : '10px 14px',
               borderRadius: 'var(--radius-md)',
               border: '1px solid var(--color-border)',
-              boxShadow: '0 2px 10px rgba(0, 0, 0, 0.10)',
+              boxShadow: '0 2px 10px rgba(0, 0, 0, 0.12)',
               fontFamily: 'var(--font-sans)',
-              minWidth: 260,
+              minWidth: isLegendCollapsed ? 0 : 260,
               maxWidth: 320,
+              cursor: isLegendCollapsed ? 'pointer' : 'default',
+              transition: 'all 150ms ease',
             }}
+            onClick={isLegendCollapsed ? () => setIsLegendCollapsed(false) : undefined}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 2 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-graphite)' }}>
-                {dualRasterData.domain_a?.long_name || activeVariable}
-              </div>
-              <span
-                style={{
-                  fontSize: 8,
-                  fontFamily: 'var(--font-mono)',
-                  color: 'var(--color-forest)',
-                  background: 'rgba(23, 63, 53, 0.08)',
-                  padding: '1px 5px',
-                  borderRadius: 2,
-                  fontWeight: 600,
-                }}
-              >
-                SHARED SCALE
-              </span>
-            </div>
-
-            <div style={{ fontSize: 9, color: 'var(--color-slate-text)', marginBottom: 6 }}>
-              {activeMode === 'mean' ? '25-Year Period Mean' : 'Long-term Trend (Theil-Sen Robust Slope)'} ({dualRasterData.domain_a?.unit})
-            </div>
-
-            {/* Dynamic Continuous CSS Gradient Bar */}
-            <div
-              style={{
-                height: 12,
-                width: '100%',
-                borderRadius: 2,
-                background: legendGradientStyle,
-                marginBottom: 4,
-                border: '1px solid rgba(0, 0, 0, 0.15)',
-              }}
-            />
-
-            {/* Scale Value Labels */}
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                fontFamily: 'var(--font-mono)',
-                fontSize: 9,
-                color: 'var(--color-graphite)',
-                marginBottom: 6,
-              }}
-            >
-              <span>{dualRasterData.shared_scale.vmin}</span>
-              {dualRasterData.shared_scale.scale_type === 'diverging' && (
-                <span style={{ color: 'var(--color-slate-text)', fontWeight: 600 }}>
-                  0.0 (Neutral)
+            {isLegendCollapsed ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-graphite)' }}>
+                  {dualRasterData.domain_a?.long_name || activeVariable} Scale
                 </span>
-              )}
-              <span>{dualRasterData.shared_scale.vmax}</span>
-            </div>
-
-            {/* Comparative Domain Summary */}
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 2,
-                padding: '4px 6px',
-                background: 'var(--color-muted)',
-                borderRadius: 3,
-                fontSize: 9,
-                fontFamily: 'var(--font-mono)',
-                marginBottom: 6,
-              }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', color: '#B96F50' }}>
-                <span>Domain A ({regionAName}):</span>
-                <strong>
-                  {activeMode === 'trend' && (dualRasterData.domain_a?.statistics?.domain_mean ?? 0) >= 0 ? '+' : ''}
-                  {dualRasterData.domain_a?.statistics?.domain_mean ?? 'N/A'} {dualRasterData.domain_a?.unit}
-                </strong>
+                <span
+                  style={{
+                    fontSize: 10,
+                    fontFamily: 'var(--font-mono)',
+                    color: 'var(--color-forest)',
+                    fontWeight: 600,
+                  }}
+                >
+                  [Show Legend ▲]
+                </span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', color: '#537D8C' }}>
-                <span>Domain B ({regionBName}):</span>
-                <strong>
-                  {activeMode === 'trend' && (dualRasterData.domain_b?.statistics?.domain_mean ?? 0) >= 0 ? '+' : ''}
-                  {dualRasterData.domain_b?.statistics?.domain_mean ?? 'N/A'} {dualRasterData.domain_b?.unit}
-                </strong>
-              </div>
-            </div>
+            ) : (
+              <>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-graphite)' }}>
+                    {dualRasterData.domain_a?.long_name || activeVariable}
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span
+                      style={{
+                        fontSize: 8,
+                        fontFamily: 'var(--font-mono)',
+                        color: 'var(--color-forest)',
+                        background: 'rgba(23, 63, 53, 0.08)',
+                        padding: '1px 5px',
+                        borderRadius: 2,
+                        fontWeight: 600,
+                      }}
+                    >
+                      SHARED SCALE
+                    </span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsLegendCollapsed(true);
+                      }}
+                      title="Minimize Legend to view full map"
+                      style={{
+                        background: 'transparent',
+                        border: 'none',
+                        cursor: 'pointer',
+                        color: 'var(--color-slate-text)',
+                        fontSize: 10,
+                        fontFamily: 'var(--font-mono)',
+                        padding: '1px 4px',
+                        fontWeight: 600,
+                        borderRadius: 3,
+                      }}
+                      aria-label="Collapse legend"
+                    >
+                      [Hide ▼]
+                    </button>
+                  </div>
+                </div>
 
-            {/* Scientific Provenance Note */}
-            <div
-              style={{
-                fontSize: 8,
-                fontFamily: 'var(--font-mono)',
-                color: 'var(--color-slate-text)',
-                lineHeight: 1.3,
-              }}
-            >
-              NASA POWER (MERRA-2) · 0.5° × 0.625° native · 4× display smoothing
-            </div>
+                <div style={{ fontSize: 9, color: 'var(--color-slate-text)', marginBottom: 6 }}>
+                  {activeMode === 'mean' ? '25-Year Period Mean' : 'Long-term Trend (Theil-Sen Robust Slope)'} ({dualRasterData.domain_a?.unit})
+                </div>
+
+                {/* Dynamic Continuous CSS Gradient Bar */}
+                <div
+                  style={{
+                    height: 12,
+                    width: '100%',
+                    borderRadius: 2,
+                    background: legendGradientStyle,
+                    marginBottom: 4,
+                    border: '1px solid rgba(0, 0, 0, 0.15)',
+                  }}
+                />
+
+                {/* Scale Value Labels */}
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: 9,
+                    color: 'var(--color-graphite)',
+                    marginBottom: 6,
+                  }}
+                >
+                  <span>{dualRasterData.shared_scale.vmin}</span>
+                  {dualRasterData.shared_scale.scale_type === 'diverging' && (
+                    <span style={{ color: 'var(--color-slate-text)', fontWeight: 600 }}>
+                      0.0 (Neutral)
+                    </span>
+                  )}
+                  <span>{dualRasterData.shared_scale.vmax}</span>
+                </div>
+
+                {/* Comparative Domain Summary */}
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 2,
+                    padding: '4px 6px',
+                    background: 'var(--color-muted)',
+                    borderRadius: 3,
+                    fontSize: 9,
+                    fontFamily: 'var(--font-mono)',
+                    marginBottom: 6,
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', color: '#B96F50' }}>
+                    <span>Domain A ({regionAName}):</span>
+                    <strong>
+                      {activeMode === 'trend' && (dualRasterData.domain_a?.statistics?.domain_mean ?? 0) >= 0 ? '+' : ''}
+                      {dualRasterData.domain_a?.statistics?.domain_mean ?? 'N/A'} {dualRasterData.domain_a?.unit}
+                    </strong>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', color: '#537D8C' }}>
+                    <span>Domain B ({regionBName}):</span>
+                    <strong>
+                      {activeMode === 'trend' && (dualRasterData.domain_b?.statistics?.domain_mean ?? 0) >= 0 ? '+' : ''}
+                      {dualRasterData.domain_b?.statistics?.domain_mean ?? 'N/A'} {dualRasterData.domain_b?.unit}
+                    </strong>
+                  </div>
+                </div>
+
+                {/* Scientific Provenance Note */}
+                <div
+                  style={{
+                    fontSize: 8,
+                    fontFamily: 'var(--font-mono)',
+                    color: 'var(--color-slate-text)',
+                    lineHeight: 1.3,
+                  }}
+                >
+                  NASA POWER (MERRA-2) · 0.5° × 0.625° native · 4× display smoothing
+                </div>
+              </>
+            )}
           </div>
         )}
 
@@ -1120,6 +1174,7 @@ export const MapCanvas: React.FC<MapCanvasProps> = ({
 
       {/* ── Bottom Status Bar (Pinned) ─────────────────────────────── */}
       <div
+        className="map-footer-hud"
         style={{
           height: 32,
           padding: '0 14px',

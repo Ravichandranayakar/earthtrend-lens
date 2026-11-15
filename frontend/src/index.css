@@ -302,18 +302,24 @@ body {
     width: 100% !important;
     border-right: none !important;
     border-bottom: 1px solid var(--color-border) !important;
-    max-height: 500px;
+    max-height: 480px;
   }
   .investigate-workspace-layout > div:last-child {
-    min-height: 450px !important;
-    padding: 12px !important;
+    min-height: 520px !important;
+    height: 65vh !important;
+    padding: 10px !important;
   }
 }
 
 @media (max-width: 640px) {
   .investigate-workspace-layout > div:last-child {
-    min-height: 380px !important;
-    padding: 8px !important;
+    min-height: 500px !important;
+    height: 65vh !important;
+    padding: 6px !important;
+  }
+  .map-footer-hud > div:nth-child(2),
+  .map-footer-hud > div:nth-child(3) {
+    display: none !important;
   }
 }
 
@@ -329,3 +335,89 @@ body {
 .scientific-raster-overlay {
   transition: opacity 280ms ease-in-out !important;
 }
+
+/* ============================================================
+   RESPONSIVE WORKSPACE & GIS LAYOUT ADAPTATIONS
+   ============================================================ */
+
+/* Investigate editorial subbar */
+.investigate-subbar {
+  min-height: 34px;
+  height: auto;
+  padding: 6px 20px;
+}
+@media (max-width: 640px) {
+  .investigate-subbar {
+    padding: 6px 12px;
+  }
+}
+
+/* Main workspace containers */
+.analysis-main-container,
+.spatial-main-container,
+.methods-main-container {
+  padding: 28px 24px;
+}
+@media (max-width: 640px) {
+  .analysis-main-container,
+  .spatial-main-container,
+  .methods-main-container {
+    padding: 16px 12px !important;
+  }
+}
+
+/* Analysis Forensic Scorecards responsive grid */
+.analysis-scorecards-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 840px) {
+  .analysis-scorecards-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Spatial Grid Map layout */
+.spatial-grid-workbench-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(330px, 3fr);
+  gap: 16px;
+  align-items: stretch;
+}
+@media (max-width: 1024px) {
+  .spatial-grid-workbench-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .spatial-grid-workbench-grid > div:first-child {
+    min-height: 440px !important;
+    height: 55vh !important;
+  }
+  .spatial-grid-workbench-grid > div:last-child {
+    height: auto !important;
+    max-height: none !important;
+  }
+}
+
+/* Floating GIS Map HUD & Legend responsive adaptation */
+@media (max-width: 640px) {
+  .map-header-hud {
+    padding: 6px 10px !important;
+    gap: 8px !important;
+  }
+  .map-legend-hud {
+    left: 10px !important;
+    right: 10px !important;
+    bottom: 10px !important;
+    min-width: 0 !important;
+    max-width: calc(100% - 20px) !important;
+    padding: 8px 10px !important;
+  }
+  .app-footer {
+    padding: 10px 14px !important;
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 6px !important;
+  }
+}
+

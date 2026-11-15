@@ -128,10 +128,10 @@ export const DeseasonalizerChart: React.FC<DeseasonalizerChartProps> = ({ data }
         </div>
 
         {/* View Mode Selector */}
-        <div className="inline-flex rounded-lg bg-slate-100 p-0.5 border border-slate-200 self-start sm:self-auto">
+        <div className="inline-flex max-w-full overflow-x-auto rounded-lg bg-slate-100 p-0.5 border border-slate-200 self-start sm:self-auto">
           <button
             onClick={() => setViewMode('annual_trend')}
-            className={`text-xs px-3 py-1.5 rounded-md font-semibold transition-all cursor-pointer ${
+            className={`text-xs px-3 py-1.5 rounded-md font-semibold transition-all cursor-pointer whitespace-nowrap flex-shrink-0 ${
               viewMode === 'annual_trend'
                 ? 'bg-white text-slate-900 shadow-xs'
                 : 'text-slate-600 hover:text-slate-900'
@@ -141,7 +141,7 @@ export const DeseasonalizerChart: React.FC<DeseasonalizerChartProps> = ({ data }
           </button>
           <button
             onClick={() => setViewMode('deseasonalized')}
-            className={`text-xs px-3 py-1.5 rounded-md font-semibold transition-all cursor-pointer ${
+            className={`text-xs px-3 py-1.5 rounded-md font-semibold transition-all cursor-pointer whitespace-nowrap flex-shrink-0 ${
               viewMode === 'deseasonalized'
                 ? 'bg-white text-slate-900 shadow-xs'
                 : 'text-slate-600 hover:text-slate-900'
@@ -151,7 +151,7 @@ export const DeseasonalizerChart: React.FC<DeseasonalizerChartProps> = ({ data }
           </button>
           <button
             onClick={() => setViewMode('raw_seasonal')}
-            className={`text-xs px-3 py-1.5 rounded-md font-semibold transition-all cursor-pointer ${
+            className={`text-xs px-3 py-1.5 rounded-md font-semibold transition-all cursor-pointer whitespace-nowrap flex-shrink-0 ${
               viewMode === 'raw_seasonal'
                 ? 'bg-white text-slate-900 shadow-xs'
                 : 'text-slate-600 hover:text-slate-900'
